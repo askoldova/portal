@@ -1,0 +1,7 @@
+django<1.9
+django-debug-toolbar
+teamcity-messages>=1.8
+nose
+teamcity-nose
+django-nose
+coverage

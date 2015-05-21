@@ -1,0 +1,11 @@
+django<1.9
+typogrify
+smartypants
+pytz
+pillow
+lxml
+cssselect
+mysqlclient 
+gu-django-filebrowser-no-grappelli
+gu-django-tinymce
+
