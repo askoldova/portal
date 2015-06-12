@@ -1,0 +1,26 @@
+{% extends "desighn.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Header" %}{% endblock %}
+{% block content %}
+<pre>
+<h2>Lang: {{ lang.code }}</h2>
+
+<h2>Request</h2>
+{% for k, v in request %}
+    {% if k != "META" %}
+        {{ k }}: {{ v }}
+    {% endif %}
+{% endfor %}
+
+<h2>Request META</h2>
+{% for k, v in request.META %}
+    {{ k }}: {{ v }}
+{% endfor %}
+
+<h2>Settings</h2>
+{ % for k in settings %}
+    {{ k }}: {{ settings }}
+{ % endfor %}
+</pre>
+{% endblock %}

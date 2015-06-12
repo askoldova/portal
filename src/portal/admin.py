@@ -27,6 +27,7 @@ class LangForm(forms.ModelForm):
         model = models.Lang
         exclude = ()
 
+# class LangForm
 
 
 class LangAdmin(admin.ModelAdmin):
@@ -35,6 +36,27 @@ class LangAdmin(admin.ModelAdmin):
     list_display_links = list_display
 
     form = LangForm
+# class LangAdmin
+
+
+class MainMenuI18nForm(admin.TabularInline):
+    model = models.MainMenuI18n
+
+class MenuItemForm(admin.TabularInline):
+    model = models.MenuItem
+
+class MenuItemI18nForm(admin.TabularInline):
+    model = models.MenuItemI18n
+
+class MainMenuAdmin(admin.ModelAdmin):
+    inlines = (MainMenuI18nForm, MenuItemForm, MenuItemI18nForm,)
+
+    list_display = ("caption", "order", "hidden")
+    list_display_links = list_display
+
+# class MainMenuAdmin
+
+
 
 
 def action(*args, **kwargs):
@@ -42,5 +64,6 @@ def action(*args, **kwargs):
 
 
 admin.site.register(models.Lang, LangAdmin)
+admin.site.register(models.MainMenu, MainMenuAdmin)
 admin.site.add_action(action, name="action")
 admin.site.add_action(action, name="delete_selected")
