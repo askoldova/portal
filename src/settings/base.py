@@ -20,7 +20,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', '-')
 DEBUG = bool_env('DJANGO_DEBUG_ENABLED', False)
 ENABLE_MEDIA = DEBUG
 
-ALLOWED_HOSTS = [list_env('DJANGO_ALLOWED_HOSTS')]
+ALLOWED_HOSTS = list_env('DJANGO_ALLOWED_HOSTS')
 
 
 # Application definition
