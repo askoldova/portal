@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='publication',
             name='subcategory',
-            field=models.ForeignKey(default='', to='portal.MenuItem'),
+            field=models.ForeignKey(to='portal.MenuItem'),
             preserve_default=False,
         ),
         migrations.AlterField(
