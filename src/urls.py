@@ -17,7 +17,7 @@ urlpatterns = (
     url(r'^(?P<lang>\w\w)/?$', portal.default),
     url(r'^(?P<lang>\w\w)/item,(?P<id>\d+).*/?$', publications.views.old_item),
     url(r'^(?P<lang>\w\w)/(?P<year>\d\d\d\d)/(?P<month>\d\d)/(?P<day>\d\d)/(?P<slug>.+)\.html/?$',
-        publications.views.item),
+        publications.views.item, name='pubs_publication'),
 )
 
 if settings.DEBUG or settings.ENABLE_MEDIA:

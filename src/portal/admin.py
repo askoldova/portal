@@ -2,6 +2,7 @@ from django import forms
 from django.contrib import admin
 
 from . import models
+from django.core import mail
 from portal import generators
 
 
@@ -18,10 +19,12 @@ class LangForm(forms.ModelForm):
     def save(self, commit=True):
         res = super(LangForm, self).save(commit)
 
-        generators.accept_and_generate(generators.IndexPageGenerate())
-        generators.accept_and_generate(generators.DefaultPageGenerate(self.cleaned_data['code'].lower()))
+        if commit:
+            generators.accept_and_generate(generators.IndexPageGenerate())
+            generators.accept_and_generate(generators.DefaultPageGenerate(self.cleaned_data['code'].lower()))
 
         return res
+
 
     class Meta:
         model = models.Lang

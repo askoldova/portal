@@ -14,9 +14,10 @@ class PublicationManager(models.Manager):
 
 class Publication(models.Model):
     type = models.CharField(max_length=20, choices=TYPES.items(), default=TYPE_PUBLICATION)
-    slug = models.CharField(max_length=100, unique=True)
-    rss_stream = models.IntegerField()
-    rss_url = models.CharField(max_length=255)
+    slug = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    rss_stream = models.IntegerField(null=True, blank=True)
+    rss_url = models.CharField(max_length=255, null=True, blank=True)
+    subcategory = models.ForeignKey(to=portal.MenuItem)
 
     objects = PublicationManager()
 
@@ -38,7 +39,7 @@ class PublicationItem(models.Model):
     short_text = tinymce.HTMLField()
     text = tinymce.HTMLField()
     publication = models.ForeignKey(to=Publication)
-    author = models.ForeignKey(to=User)
+    author = models.ForeignKey(to=User, null=True, blank=True)
 
     objects = PublicationItemManager()
 
