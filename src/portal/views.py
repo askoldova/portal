@@ -9,6 +9,7 @@ import generation as gen
 from portal import objects
 
 portal_service = service.PortalService()
+publication_service = service.PublicationsService(portal_service=portal_service)
 
 def path_of(request):
     return request.META['PATH_INFO'] if 'PATH_INFO' in request.META else ''
@@ -47,13 +48,19 @@ def index_url():
     return urlresolvers.reverse(index)
 
 def generate_default(url, lang_code):
-    lang = portal_service.get_language(lang_code)
-    if lang == objects.Language.LANGUAGE_NOT_FOUND:
-        raise Http404("Language %s is not found" % (lang_code,))
-    if lang.code.lower() != lang_code:
-        raise Http404("Language %s is not found" % (lang_code,))
+    lang = lang_of(lang_code)
     text = loader.render_to_string("design.html", context=Context(dict(language=lang)))
     return gen.GenerationResult(url, text)
+
+
+def lang_of(code):
+    lang = portal_service.get_language(code)
+    if lang == objects.Language.LANGUAGE_NOT_FOUND:
+        raise Http404("Language %s is not found" % (code,))
+    if lang.code.lower() != code:
+        raise Http404("Language %s is not found" % (code,))
+    return lang
+
 
 def default(request, lang):
     return HttpResponse(generate_default(path_of(request), lang).content)
@@ -61,3 +68,6 @@ def default(request, lang):
 
 def default_url(language_code):
     return urlresolvers.reverse(default, kwargs=dict(lang=language_code))
+
+
+

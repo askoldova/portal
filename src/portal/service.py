@@ -155,4 +155,32 @@ class PortalService(object):
             return self.get_language(lang.code)
         except models.Lang.DoesNotExist or models.Lang.MultipleObjectsReturned:
             return objects.Language.LANGUAGE_NOT_FOUND
+
 # class PortalService
+
+
+class PublicationsService(object):
+    def __init__(self, portal_service=PortalService()):
+        """
+        :type portal_service: portal.service.PortalService
+        """
+        super(PublicationsService, self).__init__()
+        self.portal_service = portal_service
+    # def __init__
+
+    def get_publication_item_by_id(self, id, lang):
+        """
+        :type id: long
+        :type lang: portal.objects.language
+        :rtype: publication: portal.objects.PublicationView
+        """
+        id = long(id)
+        if not id:
+            raise ValueError("Publication ID is not set")
+        if not lang or not isinstance(lang, objects.Language):
+            raise ValueError("Lang [%s] is not a Language")
+
+    # def get_publication_item_by_id
+
+# class PublicationsService
+

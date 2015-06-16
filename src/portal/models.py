@@ -10,7 +10,9 @@ class LangManager(models.Manager):
 
     def get_by_code(self, code):
         return self.get(code=code)
+
     # def get_by_code
+
 # def LangManager
 
 
@@ -26,6 +28,8 @@ class Lang(models.Model):
 
     str = property(__unicode__)
 
+    class Meta:
+        ordering=("-default", "caption", )
 # def class Lang
 
 class LangLocaleManager(models.Manager):
@@ -91,7 +95,7 @@ class MenuItem(models.Model):
 
     class Meta:
         unique_together = ('menu', 'caption', 'locale')
-        ordering = ('menu__order', 'order', 'caption')
+        ordering = ('menu__hidden', 'menu__order', 'order', 'caption')
 
     def __unicode__(self):
         return u'%s-%s(%s)' % (self.menu.caption, self.caption, self.locale.code)

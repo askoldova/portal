@@ -25,7 +25,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'filebrowser',
+    'tinymce',
+
     'portal',
+    'publications',
     'generation',
 )
 
