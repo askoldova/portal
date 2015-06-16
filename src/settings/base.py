@@ -4,6 +4,14 @@ from env import env, int_env, bool_env, list_env
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+ADMINS = (
+    ('Andriy G', 'andriyg@icloud.com'),
+)
+
+DEFAULT_FROM_EMAIL = 'askoldova@andriydc.eu'
+
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+MANAGERS = ADMINS
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('DJANGO_SECRET_KEY', '-')
