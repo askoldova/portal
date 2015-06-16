@@ -1,6 +1,6 @@
 import os
 from django.utils.translation import ugettext_lazy as _
-from env import env, int_env, bool_env
+from env import env, int_env, bool_env, list_env
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -12,7 +12,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', '-')
 DEBUG = bool_env('DJANGO_DEBUG_ENABLED', False)
 ENABLE_MEDIA = DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [list_env('DJANGO_ALLOWED_HOSTS')]
 
 
 # Application definition
