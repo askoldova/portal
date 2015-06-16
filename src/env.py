@@ -45,3 +45,11 @@ def bool_env(key, default=False):
     return env(key, default=default, transform=__parse_bool)
 
 # def bool_env
+
+def list_env(key, default=()):
+    """
+    :type key: basestring
+    :type default: tuple
+    :rtype: tuple[str]
+    """
+    return env(key, default=default, transform=lambda l: tuple(l for l in l.split(",") if l))
