@@ -19,9 +19,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('type', models.CharField(default=b'Note', max_length=20, choices=[(b'Note', 'Publication'), (b'Photo', 'Photogallery'), (b'Rss', 'Rss')])),
-                ('slug', models.CharField(unique=True, max_length=100)),
-                ('rss_stream', models.IntegerField()),
-                ('rss_url', models.CharField(max_length=255)),
+                ('slug', models.CharField(max_length=100, unique=True, null=True, blank=True)),
+                ('rss_stream', models.IntegerField(null=True, blank=True)),
+                ('rss_url', models.CharField(max_length=255, null=True, blank=True)),
+                ('subcategory', models.ForeignKey(to='portal.MenuItem')),
             ],
         ),
         migrations.CreateModel(
@@ -34,7 +35,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=100)),
                 ('short_text', tinymce.models.HTMLField()),
                 ('text', tinymce.models.HTMLField()),
-                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True)),
                 ('locale', models.ForeignKey(to='portal.Lang')),
                 ('publication', models.ForeignKey(to='publications.Publication')),
             ],
