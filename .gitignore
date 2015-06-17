@@ -1,5 +1,7 @@
 **/__pycache__/
 *.pyc
-/.env
-/tests/**
+.env
+tests
 static
+.coverages
+.coverage
