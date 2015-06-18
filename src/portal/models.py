@@ -3,7 +3,6 @@ from django.db import models
 
 # Create your models here.
 import generation
-import portal.objects
 
 
 class LangManager(models.Manager):
