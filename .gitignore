@@ -5,3 +5,4 @@ tests
 static
 .coverages
 .coverage
+dump.rdb
