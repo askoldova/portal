@@ -140,4 +140,5 @@ TINYMCE_FILEBROWSER = True
 
 # Celery configuration
 BROKER_URL = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json', 'yaml']
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'yaml']
+CELERY_TASK_SERIALIZER = 'pickle'

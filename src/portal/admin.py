@@ -4,6 +4,8 @@ from django.contrib import admin
 from . import models
 from django.core import mail
 from portal import generators
+import portal.models
+import portal.objects
 
 
 class LangLocaleAdmin(admin.TabularInline):
@@ -20,8 +22,8 @@ class LangForm(forms.ModelForm):
         res = super(LangForm, self).save(commit)
 
         if commit:
-            generators.accept_and_generate(generators.IndexPageGenerate())
-            generators.accept_and_generate(generators.DefaultPageGenerate(self.cleaned_data['code'].lower()))
+            generators.accept_and_generate(portal.models.IndexPageGenerate())
+            generators.accept_and_generate(portal.models.DefaultPageGenerate(self.cleaned_data['code'].lower()))
 
         return res
 

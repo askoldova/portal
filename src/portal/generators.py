@@ -1,15 +1,8 @@
 from . import views
-import collections
 import generation as gen
+from portal.models import DefaultPageGenerate, IndexPageGenerate
 
 __author__ = 'andriy'
-
-class DefaultPageGenerate(collections.namedtuple("DefaultPageGenerate", "language_code")):
-    def __new__(cls, language_code):
-        return super(DefaultPageGenerate, cls).__new__(cls, language_code)
-
-
-# end DefaultPageGenerate
 
 def accept_and_generate(command):
     if isinstance(command, IndexPageGenerate):
@@ -21,5 +14,3 @@ def accept_and_generate(command):
     return False
 
 
-class IndexPageGenerate(object):
-    pass

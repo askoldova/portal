@@ -1,6 +1,10 @@
+import collections
 from django.db import models
 
 # Create your models here.
+import generation
+import portal.objects
+
 
 class LangManager(models.Manager):
     def get_default(self):
@@ -20,6 +24,12 @@ class Lang(models.Model):
     code = models.CharField(max_length=2)
     caption = models.CharField(max_length=50)
     default = models.BooleanField(default=False)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super(Lang, self).save(force_insert, force_update, using, update_fields)
+
+        generation.schedule_generation.apply_async((DefaultPageGenerate(self.code.lower()),))
+        generation.schedule_generation.apply_async((IndexPageGenerate(),))
 
     objects = LangManager()
 
@@ -116,3 +126,24 @@ class MenuItemI18n(models.Model):
                                    self.locale.code, self.caption)
 
 # def MenuItemI18n
+class DefaultPageGenerate:
+    def __init__(self, language_code):
+        self.language_code = language_code
+
+    def __repr__(self):
+        return u"DefaultPageGenerate(%s)" % (dict(language_code=self.language_code),)
+
+    @property
+    def language_code(self):
+        return self.language_code
+
+
+
+class IndexPageGenerate:
+    def __init__(self):
+        pass
+
+    def __repr__(self):
+        return u'IndexPageGenerate'
+
+# class IndexPageGenerate
