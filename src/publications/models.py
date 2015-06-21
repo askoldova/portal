@@ -33,7 +33,7 @@ class PublicationManager(models.Manager):
 
 class Publication(models.Model):
     state = models.CharField(max_length=5, choices=STATUSES.items(), default=STATUS_DRAFT)
-    publication_date = models.DateField()
+    publication_date = models.DateField(db_index=True)
     show_date = models.BooleanField(default=False)
     slug = models.CharField(max_length=100, unique=True, null=True, blank=True, unique_for_date=True)
     type = models.CharField(max_length=20, choices=TYPES.items(), default=TYPE_PUBLICATION)
@@ -52,6 +52,14 @@ class Publication(models.Model):
 
     class Meta:
         unique_together = (("rss_stream", "rss_url"), ("publication_date", "slug"),)
+        index_together = (("state", "publication_date"),("state", "subcategory", "publication_date"),)
+        ordering = ("-publication_date",)
+
+    def title_int(self):
+        return self.title or u"{} {}".format(self.publication_date, self.slug or self.old_id or self.id)
+
+    def __unicode__(self):
+        return u"{} ({})".format(self.title_int(), self.locale.code.lower())
 # class Publication
 
 
