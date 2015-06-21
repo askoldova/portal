@@ -6,16 +6,16 @@ DELETE FROM portal_mainmenu WHERE id > 0;
 INSERT INTO portal_mainmenu(id, caption, locale_id, `order`, hidden, width)
 SELECT cat_id, cat_name, (SELECT id FROM portal_lang WHERE code = 'UK'), 
 cat_order, cat_hidden, cat_width
-FROM categories;
+FROM load_askoldova.categories;
 
 INSERT INTO portal_mainmenui18n(caption, menu_id, locale_id)
 SELECT cat_name_eng, cat_id, (SELECT id FROM portal_lang WHERE code = 'EN')
-FROM categories;
+FROM load_askoldova.categories;
 
 INSERT INtO portal_menuitem(id, caption, locale_id, `order`, menu_id)
 SELECT sct_id, sct_name,(SELECT id FROM portal_lang WHERE code = 'UK'), 
 sct_order, sct_cat_id
-FROM subcategories;
+FROM load_askoldova.subcategories;
 
 INSERT INTO `portal_menuitemi18n`
 (
@@ -25,5 +25,5 @@ INSERT INTO `portal_menuitemi18n`
 `menu_item_id`)
 SELECT  sct_name_eng,(SELECT id FROM portal_lang WHERE code = 'EN'), 
 sct_cat_id, sct_id
-FROM subcategories;
+FROM load_askoldova.subcategories;
 

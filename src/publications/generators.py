@@ -1,3 +1,3 @@
 
 def accept_and_generate(command):
-    pass
+    return True
