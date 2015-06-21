@@ -18,8 +18,7 @@ sct_order, sct_cat_id
 FROM load_askoldova.subcategories;
 
 INSERT INTO `portal_menuitemi18n`
-(
-`caption`,
+(`caption`,
 `locale_id`,
 `menu_id`,
 `menu_item_id`)

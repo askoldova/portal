@@ -121,13 +121,13 @@ FILEBROWSER_MEDIA_ROOT = MEDIA_ROOT
 FILEBROWSER_DIRECTORY = ''
 
 FILEBROWSER_VERSIONS = dict(
-    fb={'verbose_name': _('Admin Thumbnail'), 'width': 60, 'height': 60, 'opts': 'crop'},
-    smallIx={'verbose_name': _('Smaill index'), 'width': 80, 'height': 60, 'opts': 'upscale'},
-    smallIxCr={'verbose_name': _('Smaill index crop'), 'width': 80, 'height': 60, 'opts': 'upscale crop'},
-    ix={'verbose_name': _('Index'), 'width': 300, 'height': 225, 'opts': 'upscale'},
-    galIx={'verbose_name': _('Gallery index'), 'width': 150, 'height': 113, 'opts': ''},
-    galIxCr={'verbose_name': _('Gallery index cropped'), 'width': 113, 'height': 113, 'opts': 'crop'},
-    gallery={'verbose_name': _('Gallery item'), 'width': 800, 'height': 800, 'opts': ''},
+    fb=dict(verbose_name=_('Admin Thumbnail'), width=60, height=60, opts='crop'),
+    smallIx=dict(verbose_name=_('Smaill index'), width=80, height=60, opts='upscale'),
+    smallIxCr=dict(verbose_name=_('Smaill index crop'), width=80, height=60, opts='upscale crop'),
+    ix=dict(verbose_name=_('Index'), width=300, height=225, opts='upscale'),
+    galIx=dict(verbose_name=_('Gallery index'), width=150, height=113, opts=''),
+    galIxCr=dict(verbose_name=_('Gallery index cropped'), width=113, height=113, opts='crop'),
+    gallery=dict(verbose_name=_('Gallery item'), width=800, height=800, opts=''),
 )
 
 FILEBROWSER_ADMIN_VERSIONS = ['smallIx', 'smallIxCr', 'ix', 'galIx', 'galIxCr', 'gallery']

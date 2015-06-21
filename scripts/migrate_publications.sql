@@ -12,48 +12,51 @@ AND PBI_AUTHOR NOT IN (
 );
 
 DELETE FROM publications_publicationimage WHERE id > 0;
-DELETE FROM publications_publicationitem WHERE id > 0;
 DELETE FROM publications_publicationsubcategory WHERE id > 0;
 DELETE FROM publications_publication WHERE id > 0;
+DELETE FROM publications_rssimportstream WHERE id > 0;
+
+INSERT INTO `askoldovadev`.`publications_rssimportstream`
+(`id`,
+`enabled`,
+`rss_url`,
+`pool_period_mins`,
+`next_pool`,
+`link_caption`,
+`language_id`,
+`menu_item_id`)
+SELECT rss_id, rss_active, rss_url, rss_pool_period_minutes, rss_next_pool,
+rss_caption, (SELECT id FROM portal_lang WHERE code = UPPER(rss_lang)),
+rss_sbc_id
+FROM load_askoldova.rss_feeds;
 
 INSERT INTO `publications_publication`
-(`id`,
-`type`,
-`slug`,
-`rss_stream`,
-`rss_url`,
-`subcategory_id`)
-SELECT DISTINCT p.pub_id, p.pub_type, null, pi.pbi_rss_id, pi.pbi_rss_url, 
-(SELECT psc_sct_id FROM load_askoldova.pub_subcats WHERE psc_order = 0 AND psc_pub_id = pub_id)
+(
+	state, publication_date, show_date, slug, `type`, 
+    title, short_text, text, rss_stream, rss_url, 
+    old_id, author_id, locale_id, subcategory_id,
+    next_pool
+)
+SELECT 
+	pbi_state, pbi_date, pbi_show_date, null, p.pub_type, 
+    pbi_title, pbi_text_short, pbi_text, pi.pbi_rss_id, pi.pbi_rss_url, 
+    pbi_id, 
+    (SELECT id FROM auth_user WHERE username = pbi_author),
+	(SELECT id FROM portal_lang WHERE code = UPPER(pbi_lang_id)),
+	(SELECT psc_sct_id FROM load_askoldova.pub_subcats WHERE psc_order = 0 AND psc_pub_id = pub_id)
 FROM load_askoldova.publications p 
 INNER JOIN load_askoldova.pub_items pi ON pbi_pub_id = pub_id
 WHERE NOT EXISTS (SELECT id FROM publications_publication WHERE id = pub_id);
 
 INSERT INTO `publications_publicationsubcategory`
-(
+(id,
 `publication_id`,
 `subcategory_id`)
-SELECT psc_pub_id, psc_sct_id 
+SELECT psc_id, p.id, psc_sct_id 
 FROM load_askoldova.pub_subcats 
+INNER JOIN publications_publication p ON psc_pub_id = p.old_id
 WHERE psc_order > 0
 ORDER BY psc_order;
-
-INSERT INTO `publications_publicationitem`
-(`id`,
-`publication_date`,
-`show_date`,
-`state`,
-`title`,
-`short_text`,
-`text`,
-`author_id`,
-`locale_id`,
-`publication_id`)
-SELECT DISTINCT pbi_id, pbi_date, pbi_show_date, pbi_state, pbi_title, pbi_text_short, pbi_text,
-(SELECT id FROM auth_user WHERE username = pbi_author),
-(SELECT id FROM portal_lang WHERE code = UPPER(pbi_lang_id)),
-pbi_pub_id
-FROM load_askoldova.pub_items pi;
 
 INSERT INTO `publications_publicationimage`
 (`id`,
@@ -61,9 +64,9 @@ INSERT INTO `publications_publicationimage`
 `caption`,
 `name`,
 `publication_id`)
-SELECT DISTINCT max(img_id), img_file_name, null, img_name, img_pub_id 
+SELECT DISTINCT max(img_id), img_file_name, null, img_name, p.id 
 FROM load_askoldova.images
-WHERE exists (SELECT id FROM publications_publication WHERE id = img_pub_id)
-GROUP BY img_file_name, img_name, img_pub_id;
+INNER JOIN publications_publication p ON img_pub_id = p.old_id
+GROUP BY img_file_name, img_name, p.id;
 
 
