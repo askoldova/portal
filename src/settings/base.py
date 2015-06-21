@@ -130,7 +130,7 @@ FILEBROWSER_VERSIONS = dict(
     gallery={'verbose_name': _('Gallery item'), 'width': 800, 'height': 800, 'opts': ''},
 )
 
-FILEBROWSER_ADMIN_VERSIONS = ['smallIx', 'smallIxCr', 'ix', 'galIx', 'fh_gal_ix', 'galIxCr', 'gallery']
+FILEBROWSER_ADMIN_VERSIONS = ['smallIx', 'smallIxCr', 'ix', 'galIx', 'galIxCr', 'gallery']
 FILEBROWSER_LIGHTBOX_VERSION = 'gallery'
 
 FILEBROWSER_ADMIN_THUMBNAIL = 'fb'
@@ -142,3 +142,27 @@ TINYMCE_FILEBROWSER = True
 BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'yaml']
 CELERY_TASK_SERIALIZER = 'pickle'
+
+TINYMCE_DEFAULT_CONFIG = dict(
+    theme="advanced",
+    mode="exact",
+    plugins="safari,style,layer,table,save,advhr,advimage,advlink,inlinepopups,preview,media,searchreplace,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,",
+
+    # Theme options
+    theme_advanced_buttons1="save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect,|,styleprops,spellchecker",
+    theme_advanced_buttons2="cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor,|,visualchars,nonbreaking,template,blockquote,pagebreak",
+    theme_advanced_buttons3="tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,insertlayer,moveforward,movebackward,absolute,|,fullscreen",
+    theme_advanced_toolbar_location="top",
+    theme_advanced_toolbar_align="left",
+    theme_advanced_statusbar_location="bottom",
+    theme_advanced_resizing=True,
+    theme_advanced_styles='Left float=l;Right float=r;Left float + lightbox=ll;Right float + lightbox=rl;Lightbox=lb',
+
+    content_css="/css/template.css",
+
+    relative_urls=False,
+    convert_urls=False,
+)
+
+TINYMCE_FILEBROWSER = True
+

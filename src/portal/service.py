@@ -141,8 +141,8 @@ class PortalService(object):
             base_lang = models.Lang.objects.get_by_code(base_lang.code)
             locale = models.LangLocale.objects.get_lang_locale(lang=lang, locale=base_lang)
             olang = olang._replace(name_i18n=locale.caption)
-        except models.Lang.DoesNotExist or models.Lang.MultipleObjectsReturned or \
-                models.LangLocale.DoesNotExist or models.LangLocale.MultipleObjectsReturned:
+        except (models.Lang.DoesNotExist, models.Lang.MultipleObjectsReturned,
+                models.LangLocale.DoesNotExist, models.LangLocale.MultipleObjectsReturned):
             pass
 
         return olang
@@ -153,7 +153,7 @@ class PortalService(object):
         try:
             lang = models.Lang.objects.get_default()
             return self.get_language(lang.code)
-        except models.Lang.DoesNotExist or models.Lang.MultipleObjectsReturned:
+        except (models.Lang.DoesNotExist, models.Lang.MultipleObjectsReturned):
             return objects.Language.LANGUAGE_NOT_FOUND
 
 # class PortalService

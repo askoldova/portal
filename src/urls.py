@@ -8,10 +8,10 @@ from portal import views as portal
 import publications.views
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-
     url(r'^admin/filebrowser/', include(filebrowser.urls)),
-    url(r'^tinymce/', include(tinymce.urls)),
+    url(r'^admin/tinymce/', include(tinymce.urls)),
+
+    url(r'^admin/', include(admin.site.urls)),
 
     url(r'^/?$', portal.index),
     url(r'^(?P<lang>\w\w)/?$', portal.default),

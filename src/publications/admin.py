@@ -31,8 +31,15 @@ class PublicationSubcategoryAdmin(admin.TabularInline):
     model = models.PublicationSubcategory
     extra = 1
 
+
+class PublicationImagesAdmin(admin.TabularInline):
+    model = models.PublicationImage
+    exclude = ('name',)
+    extra = 3
+
+
 class PublicationAdmin(admin.ModelAdmin):
-    inlines = (PublicationSubcategoryAdmin, PublicationItemAdmin,)
+    inlines = (PublicationSubcategoryAdmin, PublicationItemAdmin, PublicationImagesAdmin,)
 
 
 admin.site.register(models.Publication, PublicationAdmin)
