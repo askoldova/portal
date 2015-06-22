@@ -12,4 +12,4 @@ class GeneratorsDetectTest(TestCase):
         from . import remote
         installed_modules = remote._load_modules_int(logger)
         logger.info("Loaded modules generators %s" % (installed_modules,))
-        self.assertEqual(len(installed_modules), 1)
+        self.assertEqual(len(installed_modules), 2)
