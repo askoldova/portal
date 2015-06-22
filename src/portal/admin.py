@@ -2,11 +2,8 @@ from django import forms
 from django.contrib import admin
 
 from . import models
-from django.core import mail
-from portal import generators
-import portal.models
-import portal.objects
-
+# noinspection PyUnresolvedReferences
+from . import generators
 
 class LangLocaleAdmin(admin.TabularInline):
     model = models.LangLocale
@@ -17,16 +14,6 @@ class LangLocaleAdmin(admin.TabularInline):
 class LangForm(forms.ModelForm):
     def clean(self):
         self.cleaned_data['code'] = self.cleaned_data['code'].upper()
-
-    def save(self, commit=True):
-        res = super(LangForm, self).save(commit)
-
-        if commit:
-            generators.accept_and_generate(portal.models.IndexPageGenerate())
-            generators.accept_and_generate(portal.models.DefaultPageGenerate(self.cleaned_data['code'].lower()))
-
-        return res
-
 
     class Meta:
         model = models.Lang

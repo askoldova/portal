@@ -13,6 +13,7 @@ class GenerationAdmin(admin.ModelAdmin):
         return False
 
     def get_urls(self):
+        # noinspection PyProtectedMember
         opts = self.model._meta
         info = opts.app_label, (opts.model_name if hasattr(opts, 'model_name') else opts.module_name)
         return patterns('',

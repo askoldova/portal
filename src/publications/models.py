@@ -1,4 +1,7 @@
 from django.contrib.auth.models import User
+# noinspection PyUnresolvedReferences
+from . import gen_events
+import generation
 
 __author__ = 'andriy'
 
@@ -35,7 +38,7 @@ class Publication(models.Model):
     state = models.CharField(max_length=5, choices=STATUSES.items(), default=STATUS_DRAFT)
     publication_date = models.DateField(db_index=True)
     show_date = models.BooleanField(default=False)
-    slug = models.CharField(max_length=100, unique=True, null=True, blank=True, unique_for_date=True)
+    slug = models.CharField(max_length=100, null=True, blank=True, unique_for_date="publication_date")
     type = models.CharField(max_length=20, choices=TYPES.items(), default=TYPE_PUBLICATION)
     locale = models.ForeignKey(to=portal.Lang)
     title = models.CharField(max_length=256, blank=True, null=True)
@@ -49,6 +52,10 @@ class Publication(models.Model):
     old_id = models.IntegerField(null=True, blank=True, db_index=True)
 
     objects = PublicationManager()
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super(Publication, self).save(force_insert, force_update, using, update_fields)
+        generation.apply_generation_task(gen_events.PublicationPageGenerate(self.id))
 
     class Meta:
         unique_together = (("rss_stream", "rss_url"), ("publication_date", "slug"),)

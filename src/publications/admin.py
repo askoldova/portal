@@ -1,8 +1,10 @@
+__author__ = 'andriy'
+
 from django.contrib import admin
 from . import models
 from django.core import urlresolvers
-
-__author__ = 'andriy'
+# noinspection PyUnresolvedReferences
+from . import generators
 
 
 class PublicationSubcategoryAdmin(admin.TabularInline):

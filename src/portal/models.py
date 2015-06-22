@@ -1,8 +1,8 @@
-import collections
 from django.db import models
 
 # Create your models here.
 import generation
+from . import gen_events
 
 
 class LangManager(models.Manager):
@@ -27,8 +27,8 @@ class Lang(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super(Lang, self).save(force_insert, force_update, using, update_fields)
 
-        generation.schedule_generation.apply_async((DefaultPageGenerate(self.code.lower()),))
-        generation.schedule_generation.apply_async((IndexPageGenerate(),))
+        generation.apply_generation_task(gen_events.DefaultPageGenerate(self.code.lower()))
+        generation.apply_generation_task(gen_events.IndexPageGenerate(),)
 
     objects = LangManager()
 
@@ -125,24 +125,3 @@ class MenuItemI18n(models.Model):
                                    self.locale.code, self.caption)
 
 # def MenuItemI18n
-class DefaultPageGenerate:
-    def __init__(self, language_code):
-        self.language_code = language_code
-
-    def __repr__(self):
-        return u"DefaultPageGenerate(%s)" % (dict(language_code=self.language_code),)
-
-    @property
-    def language_code(self):
-        return self.language_code
-
-
-
-class IndexPageGenerate:
-    def __init__(self):
-        pass
-
-    def __repr__(self):
-        return u'IndexPageGenerate'
-
-# class IndexPageGenerate

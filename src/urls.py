@@ -7,6 +7,10 @@ import tinymce.urls
 from portal import views as portal
 import publications.views
 
+PREVIEW = 'admin/preview/'
+
+publication_url = r'^{}(?P<lang>\w\w)/(?P<year>\d\d\d\d)/(?P<month>\d\d)/(?P<day>\d\d)/(?P<slug>.+)\.html/?$'
+
 urlpatterns = [
     url(r'^admin/filebrowser/', include(filebrowser.urls)),
     url(r'^admin/tinymce/', include(tinymce.urls)),
@@ -16,8 +20,8 @@ urlpatterns = [
     url(r'^/?$', portal.index),
     url(r'^(?P<lang>\w\w)/?$', portal.default),
     url(r'^(?P<lang>\w\w)/item,(?P<id>\d+).*/?$', publications.views.old_item),
-    url(r'^(?P<lang>\w\w)/(?P<year>\d\d\d\d)/(?P<month>\d\d)/(?P<day>\d\d)/(?P<slug>.+)\.html/?$',
-        publications.views.item, name='pubs_publication'),
+    url(publication_url.format(''), publications.views.item),
+    url(publication_url.format(PREVIEW), publications.views.item_admin, name='pubs_publication'),
 ]
 
 if settings.DEBUG or settings.ENABLE_MEDIA:

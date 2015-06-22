@@ -7,10 +7,17 @@ from django.conf import settings
 
 __author__ = 'andriy'
 
-@app.task()
-def schedule_generation(command):
+@app.task(name="generation._generate_internal")
+def _schedule_generation(command1):
     from . import remote
-    remote.schedule_generation(command)
+    remote.schedule_generation(command1)
+
+def apply_generation_task(command):
+    if not command:
+        raise ValueError("Scheduled command have not be empty")
+    _schedule_generation.apply_async((command,))
+
+
 
 class GenerationResult(collections.namedtuple("GenerationResult", "url content")):
     @staticmethod

@@ -1,7 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.core import urlresolvers
 from django.http import HttpResponse
 from portal.views import path_of, lang_of, portal_service, generate_concrete_redirect
 from utils import parse_number_or_http_404
+from . import services
 
 __author__ = 'andriy'
 
@@ -13,6 +15,7 @@ def old_item(request, lang, id):
 def item(request, lang, year, month, day, slug):
     return None
 
+item_admin = login_required(item)
 
 def generate_old_item(original_url, lang, id):
     id = parse_number_or_http_404(id, "id %s is not a number" % (id,))
@@ -28,3 +31,9 @@ def old_item_ulr(lang_code, id):
         raise ValueError("id [%s] have to be a int" % (id,))
 
     return urlresolvers.reverse(old_item, kwargs=dict(lang=lang_code, id=str(id)))
+
+
+publications_service = services.PublicationService()
+
+
+

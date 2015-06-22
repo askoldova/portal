@@ -1,5 +1,5 @@
-import imp
 from django.apps import apps
+import imp
 from _celery.celery import app
 
 __author__ = 'andriyg'
@@ -9,13 +9,20 @@ _logger = app.log.get_default_logger(__file__)
 _modules = ()
 def _load_modules_int(logger):
     modules = set()
-    for app in apps.get_app_configs():
-        if hasattr(app.module, 'generators'):
-            generators = getattr(app.module, 'generators')
+    for _app in apps.get_app_configs():
+        # noinspection PyBroadException
+        try:
+            if not hasattr(_app.module, 'generators'):
+                imp("{}.generator".format(_app.label))
+            generators = getattr(_app.module, 'generators')
             if hasattr(generators, 'accept_and_generate'):
                 modules.add(generators)
                 continue
-        logger.info("Application %s contain no generator " % (app.label,))
+
+        except Exception, e:
+            logger.warn("Can't check module {} for generators.accept_and_generate".format(_app.label), exc_info=e)
+
+        logger.info("Application %s contain no generator " % (_app.label,))
 
     return tuple(modules)
 # def _load_modules_int
