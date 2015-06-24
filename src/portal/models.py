@@ -27,7 +27,7 @@ class Lang(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super(Lang, self).save(force_insert, force_update, using, update_fields)
 
-        generation.apply_generation_task(gen_events.DefaultPageGenerate(self.code.lower()))
+        generation.apply_generation_task(gen_events.DefaultPageGenerate(self.lower_code))
         generation.apply_generation_task(gen_events.IndexPageGenerate(),)
 
     objects = LangManager()
@@ -36,6 +36,8 @@ class Lang(models.Model):
         return "%s %s" % (self.code, self.caption)
 
     str = property(__unicode__)
+
+    lower_code = property(lambda self: self.code.lower())
 
     class Meta:
         ordering=("-default", "caption", )

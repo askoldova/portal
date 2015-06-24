@@ -1,5 +1,5 @@
 import collections
-
+from  portal.gen_events import *
 __author__ = 'andriyg'
 
 

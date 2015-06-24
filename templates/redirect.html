@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-    <meta http-equiv="refresh" content="0;url={{ location }}" />
+    <meta http-equiv="refresh" content="{{ timeout }};url={{ location }}" />
 </head>
 <body>
-    <a href="{{ location }}">Redirect to {{ location }}</a>
+    <a href="{{ location }}">Redirect to {{ location }}, timeout={{ timeout }}sec</a>
 </body>
 </html>

@@ -13,10 +13,15 @@ def _schedule_generation(command1):
     remote.schedule_generation(command1)
 
 def apply_generation_task(command):
-    if not command:
+    if None == command:
         raise ValueError("Scheduled command have not be empty")
-    _schedule_generation.apply_async((command,))
 
+    if not settings.REMOTE_GENERATIONS:
+        from . import remote
+        remote.schedule_generation(command)
+    else:
+        _schedule_generation.apply_async((command,))
+# def apply_generation_task
 
 
 class GenerationResult(collections.namedtuple("GenerationResult", "url content")):

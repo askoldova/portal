@@ -93,9 +93,9 @@ DATABASES = dict(
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'uk-ua'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Kiev'
 
 USE_I18N = True
 
@@ -115,19 +115,38 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'htdocs')
 
 MEDIA_URL = '/'
 
-SITE_ID=int_env('DJANGO_SITE_ID', 1)
+# === django sites configuration
+SITE_ID = int_env('DJANGO_SITE_ID', 1)
 
+# === django logging configuration
+LOGGING = dict(
+    version=1,
+    disable_existing_loggers=False,
+    handlers=dict(
+        console={
+            'class': 'logging.StreamHandler'
+        },
+    ),
+    loggers=dict(
+        django=dict(
+            handlers=['console'],
+            level=os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        ),
+    ),
+)
+
+# === filebrowser configuration
 FILEBROWSER_MEDIA_ROOT = MEDIA_ROOT
 FILEBROWSER_DIRECTORY = ''
 
 FILEBROWSER_VERSIONS = dict(
     fb=dict(verbose_name=_('Admin Thumbnail'), width=60, height=60, opts='crop'),
-    smallIx=dict(verbose_name=_('Smaill index'), width=80, height=60, opts='upscale'),
-    smallIxCr=dict(verbose_name=_('Smaill index crop'), width=80, height=60, opts='upscale crop'),
-    ix=dict(verbose_name=_('Index'), width=300, height=225, opts='upscale'),
-    galIx=dict(verbose_name=_('Gallery index'), width=150, height=113, opts=''),
-    galIxCr=dict(verbose_name=_('Gallery index cropped'), width=113, height=113, opts='crop'),
-    gallery=dict(verbose_name=_('Gallery item'), width=800, height=800, opts=''),
+    smallIx=dict(verbose_name=_('Smaill index'), width=150, height=150, opts=''),
+    smallIxCr=dict(verbose_name=_('Smaill index crop'), width=150, height=150, opts='crop'),
+    galIx=dict(verbose_name=_('Gallery index'), width=200, height=200, opts=''),
+    galIxCr=dict(verbose_name=_('Gallery index cropped'), width=200, height=200, opts='crop'),
+    ix=dict(verbose_name=_('Index'), width=300, height=300, opts='upscale'),
+    gallery=dict(verbose_name=_('Gallery item'), width=1024, height=800, opts=''),
 )
 
 FILEBROWSER_ADMIN_VERSIONS = ['smallIx', 'smallIxCr', 'ix', 'galIx', 'galIxCr', 'gallery']
@@ -136,19 +155,20 @@ FILEBROWSER_LIGHTBOX_VERSION = 'gallery'
 FILEBROWSER_ADMIN_THUMBNAIL = 'fb'
 FILEBROWSER_PREVIEW_VERSION = 'index'
 
-TINYMCE_FILEBROWSER = True
-
-# Celery configuration
+# == Celery configuration
 BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'yaml']
 CELERY_TASK_SERIALIZER = 'pickle'
+
+# === tinymce configuration
+TINYMCE_FILEBROWSER = True
 
 TINYMCE_DEFAULT_CONFIG = dict(
     theme="advanced",
     mode="exact",
     plugins="safari,style,layer,table,save,advhr,advimage,advlink,inlinepopups,preview,media,searchreplace,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,",
 
-    language="ua",
+    language="uk",
 
     # Theme options
     theme_advanced_buttons1="save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect,|,styleprops,spellchecker",
@@ -167,4 +187,12 @@ TINYMCE_DEFAULT_CONFIG = dict(
 )
 
 TINYMCE_FILEBROWSER = True
+
+# portal configuration
+
+REMOTE_GENERATIONS = False
+
+PORTAL_DEFAULT_REDIRECT_VIEW = 'pubs_all_publications'
+
+REDIRECT_HTML_TIMEOUT = 30
 

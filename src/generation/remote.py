@@ -1,10 +1,15 @@
+import logging
 from django.apps import apps
 import imp
+from django.conf import settings
 from _celery.celery import app
 
 __author__ = 'andriyg'
 
-_logger = app.log.get_default_logger(__file__)
+if not settings.REMOTE_GENERATIONS:
+    _logger = logging.getLogger(__file__)
+else:
+    _logger = app.log.get_default_logger(__file__)
 
 _modules = ()
 def _load_modules_int(logger):
@@ -37,18 +42,28 @@ def _load_modules():
 
 # def _load_modules
 
-def schedule_generation(command):
+def _generate_silent(m, command):
+    # noinspection PyBroadException
+    try:
+        return m.accept_and_generate(command)
+    except Exception as e:
+        _logger.error("Error generate for %s in %s" % (command, m,), exc_info=e)
+        return True
 
+def _generate(m, command):
+    return m.accept_and_generate(command)
+
+
+def schedule_generation(command):
     for m in _load_modules():
-        # noinspection PyBroadException
-        try:
-            if m.accept_and_generate(command):
-                return
-        except Exception as e:
-            _logger.exception("Error generate for %s in %s" % (command, m,), exc_info=e)
-            return
+        if not settings.REMOTE_GENERATIONS:
+            result = _generate(m, command)
+        else:
+            result = _generate_silent(m, command)
+        if result:
+            return True
     # for m in modules
 
-    _logger.error("Can't generate for: %s" % (command, ))
-
+    _logger.warn("Can't generate for: %s" % (command, ))
+# def schedule_generation
 

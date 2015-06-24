@@ -10,3 +10,4 @@ ENABLE_MEDIA = DEBUG or bool_env('DJANGO_FORCE_MEDIA', True)
 MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1', '::1',)
 INSTALLED_APPS += ('debug_toolbar',)
+

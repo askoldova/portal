@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 # noinspection PyUnresolvedReferences
-from . import gen_events
+from . import gen_events, objects
 import generation
 
 __author__ = 'andriy'
@@ -31,7 +31,30 @@ class RssImportStream(models.Model):
 
 
 class PublicationManager(models.Manager):
-    pass
+    def get_by_id(self, publication_id):
+        """
+        :type publication_id: long
+        :rtype: publications.models.Publication
+        """
+        return self.get(id = publication_id)
+
+    # def get_by_id
+
+    def pager_and_last_pubs(self, pubs, lang_code, published):
+        if pubs <= 0:
+            pubs = 1
+        q = self.filter(locale__code=lang_code.upper())
+        if published:
+            q = q.filter(state=STATUS_PUBLISHED)
+
+        at_all = q.aggregate(models.Count('id'))
+        pages, remind = divmod(at_all['id__count'],pubs)
+        if remind > 0:
+            pages += 1
+
+        return objects.Pager(page_nr=1, pages=pages, page=tuple(q[:pubs]))
+    # def pager_and_last_pubs
+# class PublicationManager
 
 
 class Publication(models.Model):

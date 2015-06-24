@@ -1,0 +1,32 @@
+{% load i18n %}
+<div>
+    {% for p in page %}
+        <div>
+        <h4><a href="{{ p.url }}">{{ p.title }}</a></h4>
+        {% if p.show_date %}
+            <div style="text-align: right;">{{ p.publication_date | date }}</div>
+        {% endif %}
+        <p>
+            {{ p.short_text | safe }}
+        </p>
+        <div style="text-align: right;"><a href="{{ p.url }}">
+            {% if p.custom_link_name %}
+                {{ p.custom_link_name }}
+            {% else %}
+                {% trans "Read more..." %}
+            {% endif %}</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div>
+    {{ navigate_url }}
+    Pager:
+    {% for p, url in pages_range %}
+        {% if url %}
+            <a href="{{ url }}">{{ p }}</a>
+        {% else %}
+            {{ p }}
+        {% endif %}&nbsp;
+    {% endfor %}
+</div>

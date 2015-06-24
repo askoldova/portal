@@ -1,9 +1,12 @@
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 
 from . import models
 # noinspection PyUnresolvedReferences
 from . import generators
+from django.core import urlresolvers
+
 
 class LangLocaleAdmin(admin.TabularInline):
     model = models.LangLocale
@@ -11,9 +14,10 @@ class LangLocaleAdmin(admin.TabularInline):
     extra = 1
 
 
+
 class LangForm(forms.ModelForm):
-    def clean(self):
-        self.cleaned_data['code'] = self.cleaned_data['code'].upper()
+    def clean_code(self):
+        return self.cleaned_data['code'].upper()
 
     class Meta:
         model = models.Lang
@@ -28,6 +32,14 @@ class LangAdmin(admin.ModelAdmin):
     list_display_links = list_display
 
     form = LangForm
+
+    def get_view_on_site_url(self, obj=None):
+        if not obj:
+            return None
+        return urlresolvers.reverse("{}_preview".format(settings.PORTAL_DEFAULT_REDIRECT_VIEW),
+                                    kwargs=dict(lang=obj.code.lower()))
+
+    # def get_view_on_site_url
 # class LangAdmin
 
 
