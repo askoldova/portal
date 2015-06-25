@@ -7,6 +7,7 @@ from portal.views import path_of, portal_service, generate_redirect_to_url
 from portal import objects as portal_objs
 from utils import parse_number_or_http_404, pages_range
 from . import STATUS_PUBLISHED, objects, services
+from .publication import FormattedDate
 import generation as gen
 
 __author__ = 'andriy'
@@ -124,9 +125,8 @@ def ulr_of_publication(lang, publication_date, publication_id, slug):
     :rtype: basestr
     """
     slug = slug or str(publication_id)
-    year, month, day = "{:04}".format(publication_date.year), "{:02}".format(publication_date.month),\
-                       "{:02}".format(publication_date.day)
-    return urlresolvers.reverse(publication_view, kwargs=dict(lang=lang, year=year, month=month, day=day, slug=slug))
+    date = FormattedDate(publication_date)
+    return urlresolvers.reverse(publication_view, kwargs=dict(lang=lang, year=date.year, month=date.month, day=date.day, slug=slug))
 # def url_of_publication
 
 def publication_view(request, lang, year, month, day, slug):

@@ -4,8 +4,11 @@ from django.contrib import admin
 from . import models
 from django.core import urlresolvers
 # noinspection PyUnresolvedReferences
-from . import generators
+from . import generators, publication
 
+from portal import services as portal_services
+
+portal_service = portal_services.PortalService()
 
 class PublicationSubcategoryAdmin(admin.TabularInline):
     model = models.PublicationSubcategory
@@ -26,6 +29,14 @@ class PublicationAdmin(admin.ModelAdmin):
     date_hierarchy = "publication_date"
 
     list_filter = ("state", "locale","rss_stream",)
+
+    def get_form(self, request, obj=None, **kwargs):
+        if obj:
+            slug = str(obj.old_id or obj.slug or obj.id)
+            portal_service.set_entity_filebrowser_path("images", *(publication.FormattedDate(obj.publication_date) + (slug,)))
+        else:
+            portal_service.set_entity_filebrowser_path("images")
+        return super(PublicationAdmin, self).get_form(request, obj, **kwargs)
 
     def get_view_on_site_url(self, obj=None):
         """
