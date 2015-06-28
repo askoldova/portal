@@ -1,3 +1,7 @@
+from gettext import gettext as _
+from django import forms
+from django.core.exceptions import ValidationError
+
 __author__ = 'andriy'
 
 from django.contrib import admin
@@ -56,5 +60,28 @@ class PublicationAdmin(admin.ModelAdmin):
 
 # class PublicationAdmin
 
+
+class ConfigurationForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Configuration
+        exclude = ()
+
+    def clean(self):
+        clean_data = super(ConfigurationForm, self).clean()
+
+        if (not self.instance or not self.instance.id) and models.Configuration.objects.filter():
+            raise ValidationError(_(u"Can't sore configuration, because only one instance is allowed"))
+        return clean_data
+    # def clean
+# class ConfigurationForm
+
+
+class ConfigurationAdmin(admin.ModelAdmin):
+    form = ConfigurationForm
+    raw_id_fields = ('last_old_publication',)
+# class ConfigurationAdmin
+
 admin.site.register(models.Publication, PublicationAdmin)
 admin.site.register(models.RssImportStream)
+admin.site.register(models.Configuration, ConfigurationAdmin)

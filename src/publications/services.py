@@ -44,29 +44,57 @@ class PublicationService(object):
             raise ValueError("Publication ID is not set")
 
         try:
-            pub = models.Publication.objects.get_by_id(id=publication_id)
+            pub = models.Publication.objects.get_by_id(publication_id=publication_id)
         except models.Publication.DoesNotExist:
-            return objects.PUBLICATION_NOT_FOUND
+            return objects.PUB_REF_NOT_FOUND
 
-        locale = self.portal_service.get_language(pub.locale)
-        url = self.urls_resolver.get_publication_url(language_code=locale.lower_code, publication_id=pub.id,
-                                                     publication_date=pub.pub, slug=pub.slug)
-
-        return objects.PublicationRef(language_code=locale.lower_code, publication_id=pub.id,
-                                      old_id=pub.old_id, publication_date=pub.pub, slug=pub.slug,
-                                      title=pub.title, url=url)
+        return self._load_pub_ref(pub)
 
     # def get_publication_by_id
 
+    def _load_pub_ref(self, pub):
+        locale = self.portal_service.get_language_locale(pub.locale)
+        url = self.urls_resolver.get_publication_url(language_code=locale.lower_code, publication_id=pub.id,
+                                                     publication_date=pub.publication_date, slug=pub.slug)
+        return objects.PublicationRef(language=locale, publication_id=pub.id,
+                                      old_id=pub.old_id, publication_date=pub.publication_date, slug=pub.slug,
+                                      title=pub.title, url=url, status=pub.state)
+
+    # def _load_pub_ref
+
     def get_last_publications(self, lang, published, page_size):
+        """
+        :type lang: portal.objects.Language
+        :type page_size: long
+        :type published: boolean
+        :rtype: publications.objects.Pager
+        """
         if not lang or not isinstance(lang, portal_objs.Language):
             raise ValueError("Language[{}] is not set or not a portal.objects.Language".format(lang))
 
-        pager = models.Publication.objects.pager_and_last_pubs(page_size, lang_code=lang.code,
-                                                               published=published)
+        pager = models.Publication.objects.pager_and_last_pubs(page_size=page_size, lang_code=lang.code)
         return pager.replace_page(tuple(self._publication_preview(p) for p in pager.page))
 
     # def get_last_publications
+
+    def get_publications_page(self, lang, page, page_size):
+        """
+        :type lang: portal.objects.Language
+        :type page: long
+        :type page_size: long
+        :rtype: publications.objects.Pager
+        """
+        if not lang or not isinstance(lang, portal_objs.Language):
+            raise ValueError("Language[{}] is not set or not a portal.objects.Language".format(lang))
+
+        if page < 1:
+            return objects.PAGE_NOT_FOUND
+        pager = models.Publication.objects.pager_and_all_pubs_page(page=page, page_size=page_size, lang_code=lang.code)
+        if not pager.page:
+            return objects.PAGE_NOT_FOUND
+        return pager.replace_page(tuple(self._publication_preview(p) for p in pager.page))
+
+    # def get_publications_page
 
     def _publication_preview(self, pub):
         if not pub or not isinstance(pub, models.Publication):
@@ -100,5 +128,42 @@ class PublicationService(object):
 
         return pub.state in (STATUS_PUBLISHED, STATUS_HIDDEN) and not (pub.rss_url and pub.rss_stream)
     # def _is_published
+
+    def get_all_pubs_new_page_by_old(self, lang, old_page):
+        """
+        :type lang: portal.objects.Language
+        :type old_page: long
+        :rtype : long
+        """
+        if not lang or not isinstance(lang, portal_objs.Language):
+            raise ValueError("Language[{}] is not set or not a portal.objects.Language".format(lang))
+
+        if old_page < 1:
+            return 0
+
+        conf = models.Configuration.objects.get_configuration()
+
+        old_pages_pager = models.Publication.objects. \
+            pager_all_pubs(lang_code=lang.code, page_size=conf.publications_page_size)
+
+        if old_page > old_pages_pager.pages:
+            return 0
+
+        return old_pages_pager.pages - old_page + 1
+
+    # def get_all_pubs_new_page_by_old
+
+    def get_publication_ref_by_old_id(self, lang_code, old_id):
+        """
+        :type lang_code: basestring
+        :type old_id: long
+        :rtype : publications.objects.PublicationRef
+        """
+        try:
+            publication = models.Publication.objects.get_by_land_and_old_id(lang_code, old_id)
+        except models.Publication.DoesNotExist:
+            return objects.PUB_REF_NOT_FOUND
+
+        return self._load_pub_ref(publication)
 
 # class PublicationService

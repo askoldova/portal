@@ -23,12 +23,12 @@ def generate_redirect_to_url(original_url, url):
     return gen.GenerationResult(original_url, string)
 
 
-def generate_concrete_redirect(original_url, view_to, view_args, view_kwargs):
+def generate_concrete_redirect(original_url, view_to, view_args=(), view_kwargs={}):
     url = urlresolvers.reverse(viewname=view_to, args=view_args, kwargs=view_kwargs)
     return generate_redirect_to_url(original_url, url)
 
 
-def generate_redirect_to(original_url, args_to, kwargs, kwargs_to, view_to):
+def generate_redirect_to(original_url, view_to, args_to=(), kwargs_to=(), **kwargs):
     kwargs = dict((k, v if not isinstance(v, types.FunctionType) else v()) for k, v in kwargs.items())
     view_args = tuple([kwargs[k] if k else None for k in args_to])
     view_kwargs = dict((k, v) for k, v in kwargs.items() if k in kwargs_to)
@@ -37,7 +37,7 @@ def generate_redirect_to(original_url, args_to, kwargs, kwargs_to, view_to):
 
 def redirect_to(request, view_to, args_to=(), kwargs_to=(), **kwargs):
     return HttpResponse(request.META['PATH_INFO'],
-                        generate_redirect_to(args_to, kwargs, kwargs_to, view_to).index())
+                        generate_redirect_to(args_to, kwargs, view_to).index())
 
 
 def generate_index(url):

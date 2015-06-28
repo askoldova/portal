@@ -44,6 +44,9 @@ def save_generation(generation):
     if not generation or not isinstance(generation, GenerationResult):
         raise ValueError("%s generation is empty or not GenerationResult" % (generation))
 
+    if generation == EMPTY_GENERATION:
+        return
+
     url = generation.url
     if url.endswith("/") or not url.endswith(".html") or not url.endswith(".htm"):
         url += "/index.html"
@@ -68,3 +71,5 @@ def save_generation(generation):
     return True
 
 # def save_generation
+
+EMPTY_GENERATION = GenerationResult('', 'No content')

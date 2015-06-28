@@ -21,6 +21,7 @@
 </div>
 <div>
     {{ navigate_url }}
+    <p>
     Pager:
     {% for p, url in pages_range %}
         {% if url %}
@@ -29,4 +30,6 @@
             {{ p }}
         {% endif %}&nbsp;
     {% endfor %}
+    </p>
+    <p>Page #: {{ page_nr }}</p>
 </div>

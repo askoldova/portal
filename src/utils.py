@@ -2,10 +2,11 @@ import datetime
 from django.http import Http404
 
 
-def parse_number_or_http_404(id, error):
+def parse_number_or_http_404(value, error=None):
     try:
-        return long(id)
+        return long(value)
     except ValueError:
+        error = error or "Can't parse numeric value [{}]".format(value)
         raise Http404(error)
 
 # def parse_number_or_http_404
@@ -31,20 +32,37 @@ def pages_range(pages, page, urlresolver_func, **kwargs):
     if page > pages:
         page = pages
 
-    kwargs['page'] = 1
-    plist = (1, urlresolver_func(**kwargs)),
+    def _page_and_ref(_page):
+        kwargs['page'] = _page
+        return _page, None if _page == page else urlresolver_func(**kwargs)
+    _NONE_REF = ("...", None)
+
+    plist = _page_and_ref(1),
     if page - 5 > 2:
-        plist += (("...", None),)
+        plist += _NONE_REF,
     range_from = max(2, page-5)
     range_to = min(page+5, pages-1)
     for i in range(range_from, range_to+1):
-        kwargs['page'] = i
-        plist += ((i, urlresolver_func(**kwargs)),)
+        plist += _page_and_ref(i),
     if page + 5 < pages - 1:
-        plist += (("...", None),)
-    kwargs['page'] = pages
-    plist +=(pages, urlresolver_func(**kwargs)),
+        plist += (_NONE_REF,)
+    plist += _page_and_ref(pages),
 
     return tuple(reversed(plist))
 # def pages_range
 
+def check_exist_and_type(value, name, _type, *types):
+    types = types or ()
+    if None != _type:
+        types = (_type,) + types
+
+    if not value:
+        raise ValueError("{} value is not set".format(name))
+    if not types:
+        return
+    for t in types:
+        if isinstance(value, t):
+            return
+    raise ValueError("{} value [{}] is not one of {}".format(name, value, types))
+
+# def check_exists_and_type

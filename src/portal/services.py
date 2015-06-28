@@ -117,6 +117,22 @@ class PortalService(object):
         url.split("/")
     # def generate_view
 
+    def get_language_locale(self, lang, i10n_lang=None):
+        """
+        :type lang: portal.models.Lang
+        :type i10n_lang: portal.objects.Language
+        :rtype: portal.objects.Language
+        """
+        if not lang or not isinstance(lang, models.Lang):
+            raise ValueError("lang [{}] is empty or not portal.models.Lang" % (lang,))
+
+        if i10n_lang and not isinstance(i10n_lang, objects.Language):
+            raise ValueError("base_lang %s is not object.Language" % (lang,))
+
+        return self._load_language_and_locale(lang, i10n_lang)
+
+    # def get_language
+
     def get_language(self, lang, i10n_lang=None):
         """
         :type lang: basestring

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
-# noinspection PyUnresolvedReferences
 from . import gen_events, objects
+from django.utils.translation import gettext_lazy as _
 import generation
 
 __author__ = 'andriy'
@@ -40,20 +40,74 @@ class PublicationManager(models.Manager):
 
     # def get_by_id
 
-    def pager_and_last_pubs(self, pubs, lang_code, published):
-        if pubs <= 0:
-            pubs = 1
-        q = self.filter(locale__code=lang_code.upper())
-        if published:
-            q = q.filter(state=STATUS_PUBLISHED)
+    def get_by_land_and_old_id(self, lang_code, old_id):
+        """
+        :type lang_code: basestring
+        :type old_id: long
+        :rtype: publications.models.Publication
+        """
+        return self.get(old_id=old_id, locale__code=lang_code.upper())
 
+    # def get_by_land_and_old_id
+
+    def _count_pages(self, page_size, q):
         at_all = q.aggregate(models.Count('id'))
-        pages, remind = divmod(at_all['id__count'],pubs)
+        pages, remind = divmod(at_all['id__count'], page_size)
         if remind > 0:
             pages += 1
+        return pages, remind
+    # def `_count_pages
 
-        return objects.Pager(page_nr=1, pages=pages, page=tuple(q[:pubs]))
+    def pager_and_last_pubs(self, page_size, lang_code):
+        page_size, q = self._fix_page_size_and_get_pub_query(lang_code, page_size)
+
+        pages, remind = self._count_pages(page_size, q)
+
+        return objects.Pager(page_nr=pages, pages=pages, page=tuple(q[:page_size]))
+
     # def pager_and_last_pubs
+
+    def pager_and_all_pubs_page(self, page, page_size, lang_code):
+        page_size, q = self._fix_page_size_and_get_pub_query(lang_code, page_size)
+
+        pages, remind = self._count_pages(page_size, q)
+        if page > pages:
+            page_data = ()
+        elif page <= pages / 2:
+            page_data = tuple(q.reverse()[(page - 1) * page_size:page * page_size])
+            page_data = tuple(reversed(page_data))
+        elif remind == 0:
+            _from = remind + (pages - page) * page_size
+            _to = remind + (pages - page + 1) * page_size
+
+            page_data = tuple(q[_from:_to])
+        elif page == pages:
+            page_data = tuple(q[0:remind])
+        else:
+            _from = remind + (pages - page - 1) * page_size
+            _to = remind + (pages - page) * page_size
+
+            page_data = tuple(q[_from:_to])
+
+        return objects.Pager(page_nr=page, pages=pages, page=page_data)
+
+    def _fix_page_size_and_get_pub_query(self, lang_code, page_size):
+        if page_size <= 0:
+            page_size = 1
+        q = self.filter(locale__code=lang_code.upper()).filter(state=STATUS_PUBLISHED)
+        return page_size, q
+
+    # def pager_and_all_pubs_page
+
+    def pager_all_pubs(self, lang_code, page_size):
+        page_size, q = self._fix_page_size_and_get_pub_query(lang_code, page_size)
+
+        pages, remind = self._count_pages(page_size, q)
+
+        return objects.Pager(page_nr=1, pages=pages, page=())
+
+    # def pager_all_pubs_to
+
 # class PublicationManager
 
 
@@ -78,18 +132,21 @@ class Publication(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super(Publication, self).save(force_insert, force_update, using, update_fields)
-        generation.apply_generation_task(gen_events.PublicationPageGenerate(self.id))
+        generation.apply_generation_task(gen_events.PublicationGenerate(self.id))
 
-    class Meta:
-        unique_together = (("rss_stream", "rss_url"), ("publication_date", "slug"),)
-        index_together = (("state", "publication_date"),("state", "subcategory", "publication_date"),)
-        ordering = ("-publication_date",)
+    # def save
 
     def title_int(self):
         return self.title or u"{} {}".format(self.publication_date, self.slug or self.old_id or self.id)
 
     def __unicode__(self):
         return u"{} ({})".format(self.title_int(), self.locale.code.lower())
+
+    class Meta:
+        unique_together = (("rss_stream", "rss_url"), ("publication_date", "slug"),)
+        index_together = (("state", "publication_date"),("state", "subcategory", "publication_date"),)
+        ordering = ("-publication_date",)
+
 # class Publication
 
 
@@ -121,3 +178,29 @@ class PublicationImage(models.Model):
         ordering = ("id",)
 # class PublicationImage
 
+
+class ConfigurationManager(models.Manager):
+    def get_configuration(self):
+        """
+        :rtype: publications.models.Configuration
+        """
+        try:
+            return self.get()
+        except Configuration.DoesNotExist:
+            conf = self.create()
+            conf.save()
+            return conf
+
+    # def get_configuration
+# class ConfigurationManager
+
+
+class Configuration(models.Model):
+    publications_page_size = models.IntegerField(default=6, verbose_name=_("News Page Size"))
+    last_old_publication = models.ForeignKey(to=Publication, blank=True, null=True)
+
+    objects = ConfigurationManager()
+
+    def __unicode__(self):
+        return u"Configuration"
+# class Configuration

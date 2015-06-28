@@ -13,6 +13,9 @@ publication_url = r'^{}(?P<lang>\w\w)/(?P<year>\d\d\d\d)/(?P<month>\d\d)/(?P<day
 index_url = r'^{}$';
 all_publications_url = r'^{}(?P<lang>\w\w)/?$'
 all_publications_page_url = r'^{}(?P<lang>\w\w)/(?P<page>\d+).html$'
+all_old_publications_url = r'^{}(?P<lang>\w\w)/index$'
+all_old_publications_page_url = r'^{}(?P<lang>\w\w)/index,(?P<page>\d+)$'
+old_publication_url = r'{}^(?P<lang>\w\w)/item,(?P<id>\d+).*/?$'
 
 urlpatterns = [
     url(r'^admin/filebrowser/', include(filebrowser.urls)),
@@ -22,25 +25,36 @@ urlpatterns = [
 
     url(index_url.format(PREVIEW), portal.index_view_admin, name='portal_index_preview'),
     url(all_publications_url.format(PREVIEW),
+        pubs.old_publication_view_admin),
+    url(all_publications_url.format(PREVIEW),
         pubs.all_publications_view_admin, name='pubs_all_publications_preview'),
     url(all_publications_page_url.format(PREVIEW),
         pubs.all_publications_page_view_admin, name='pubs_all_publications_page_preview'),
+    url(all_old_publications_url.format(PREVIEW),
+        pubs.all_old_publications_view_admin, name='pubs_all_old_publications_preview'),
+    url(all_old_publications_page_url.format(PREVIEW),
+        pubs.all_old_publications_page_view_admin, name='pubs_all_old_publications_page_preview'),
+    url(all_publications_page_url.format(PREVIEW),
+        pubs.all_old_publications_page_view_admin, name='pubs_all_publications_page_preview'),
     url(publication_url.format(PREVIEW), pubs.publication_view_admin, name='pubs_publication_preview'),
 ]
 
-if settings.DEBUG or settings.ENABLE_MEDIA:
+if (settings.DEBUG or settings.ENABLE_MEDIA) and not settings.FORCE_DISABLE_MEDIA:
     urlpatterns += [
         url(r'^%s(?P<path>.*)$' % settings.MEDIA_URL[1:],
             serve,
             {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
     ]
 
-old_publication_url = r'{}^(?P<lang>\w\w)/item,(?P<id>\d+).*/?$'
 urlpatterns += [
     url(index_url.format(''), portal.index_view),
     url(all_publications_url.format(''), pubs.all_publications_view, name='pubs_all_publications'),
     url(all_publications_page_url.format(''), pubs.all_publications_page_view),
-    url(old_publication_url.format(''), pubs.old_item_view),
+    url(old_publication_url.format(''), pubs.old_publication_view),
+    url(all_old_publications_url.format(''), pubs.all_old_publications_view,
+        name='pubs_all_old_publications'),
+    url(all_old_publications_page_url.format(''), pubs.all_old_publications_page_view,
+        name='pubs_all_old_publications_page'),
     url(publication_url.format(''), pubs.publication_view),
 ]
 
