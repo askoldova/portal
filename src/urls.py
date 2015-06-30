@@ -15,7 +15,7 @@ all_publications_url = r'^{}(?P<lang>\w\w)/?$'
 all_publications_page_url = r'^{}(?P<lang>\w\w)/(?P<page>\d+).html$'
 all_old_publications_url = r'^{}(?P<lang>\w\w)/index$'
 all_old_publications_page_url = r'^{}(?P<lang>\w\w)/index,(?P<page>\d+)$'
-old_publication_url = r'{}^(?P<lang>\w\w)/item,(?P<id>\d+).*/?$'
+old_publication_url = r'{}^(?P<lang>\w\w)/item,(?P<old_id>\d+).*/?$'
 
 urlpatterns = [
     url(r'^admin/filebrowser/', include(filebrowser.urls)),

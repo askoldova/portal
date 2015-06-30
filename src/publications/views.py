@@ -8,7 +8,6 @@ from portal import objects as portal_objs
 from publications.publication import dict_of_publication_url_parts
 from utils import parse_number_or_http_404, pages_range
 from . import STATUS_PUBLISHED, objects, services, STATUS_HIDDEN
-from .publication import FormattedDate
 import generation as gen
 import utils
 
