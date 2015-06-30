@@ -49,9 +49,27 @@ class Pager(collections.namedtuple("Pager", "page_nr pages page")):
 
 PAGE_NOT_FOUND = Pager(0, 0, ())
 
+
 class PublicationPreview(collections.namedtuple("PublicationPreview",
                                                 "url publication_id title "
                                                 "custom_link_name short_text published "
                                                 "publication_date show_date")):
     pass
 # class PublicationPreview
+
+
+class PublicationView(collections.namedtuple("PublicationView",
+                                             "pub_date show_date title text "
+                                             "categories images")):
+    def __new__(cls, pub_date, show_date, title, text, categories, images):
+        return super(PublicationView, cls).\
+            __new__(cls, pub_date=pub_date, show_date=show_date, title=title,
+                    text=text, categories=categories, images=images)
+
+    # def __new__
+
+# class PublicationView
+
+
+PUB_NOT_FOUND = PublicationView(pub_date=utils.MIN_DATE, show_date=False,
+                                title='', text='No text', categories=(), images=())

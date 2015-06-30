@@ -1,5 +1,7 @@
+import datetime
 from django.contrib.auth.models import User
 from . import gen_events, objects
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 import generation
 
@@ -107,6 +109,23 @@ class PublicationManager(models.Manager):
         return objects.Pager(page_nr=1, pages=pages, page=())
 
     # def pager_all_pubs_to
+
+    def get_by_lang_date_slug(self, lang_code, publication_date,
+                              publication_id, slug):
+        """
+        :type lang_code: basestring
+        :type publication_date: datetime.date
+        :type publication_id: long
+        :type slug: basestring
+        :rtype: publications.models.Publication
+        """
+        next_pub_date = publication_date + datetime.timedelta(days=1)
+        return self.filter(locale__code=lang_code.upper(),
+                        publication_date__gte=publication_date,
+                        publication_date__lt=next_pub_date).\
+                    filter(Q(id=publication_id) | Q(slug=slug)).get()
+
+    # def get_by_lang_date_slug
 
 # class PublicationManager
 

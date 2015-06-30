@@ -1,3 +1,6 @@
+import datetime
+import utils
+
 __author__ = 'andriyg'
 
 from . import models, objects, STATUS_PUBLISHED, STATUS_HIDDEN
@@ -104,10 +107,7 @@ class PublicationService(object):
             url=pub.rss_url
             custom_link_name = pub.rss_stream.link_caption
         else:
-            url = self.urls_resolver.get_publication_url(language_code=pub.locale.lower_code,
-                                                         publication_id=pub.id,
-                                                         publication_date=pub.publication_date,
-                                                         slug=pub.slug)
+            url = self._url_of_publication(pub)
             custom_link_name = None
 
         return objects.PublicationPreview(url=url, publication_id=pub.id, title=pub.title or '',
@@ -115,7 +115,19 @@ class PublicationService(object):
                                           short_text=pub.short_text, published=self._is_published(pub),
                                           publication_date=pub.publication_date,
                                           show_date=pub.show_date)
+
     # def _publication_preview
+
+    def _url_of_publication(self, pub):
+        """
+        :type pub: publications.models.Publication
+        :rtype: basestring
+        """
+        return self.urls_resolver.get_publication_url(language_code=pub.locale.lower_code,
+                                                      publication_id=pub.id,
+                                                      publication_date=pub.publication_date,
+                                                      slug=pub.slug)
+    # def _url_of_publication
 
     # noinspection PyMethodMayBeStatic
     def _is_published(self, pub):
@@ -165,5 +177,68 @@ class PublicationService(object):
             return objects.PUB_REF_NOT_FOUND
 
         return self._load_pub_ref(publication)
+    # def get_publication_ref_by_old_id
+
+    def get_publication_view_by_url(self, lang, year, month, day, slug):
+        """
+        :type lang: portal.objects.Language
+        :type year: long
+        :type month: long
+        :type day: long
+        :param slug: basestring
+        :return: publications.objects.PublicationView
+        """
+        utils.check_exist_and_type(lang, "lang", portal_objs.Language)
+
+        try:
+            publication_id = long(slug)
+        except ValueError:
+            publication_id = None
+
+        try:
+            date = datetime.date(year, month, day)
+        except ValueError:
+            return objects.PUB_NOT_FOUND
+
+        try:
+            pub = models.Publication.objects\
+                .get_by_lang_date_slug(lang_code=lang.code, publication_date=date,
+                                       publication_id=publication_id, slug=slug)
+        except models.Publication.DoesNotExist:
+            return objects.PUB_NOT_FOUND
+
+        return self._load_publication(lang=lang, pub=pub)
+
+    def _load_publication(self, lang, pub):
+        """
+        :type lang: portal.objects.Language
+        :type pub: publications.models.Publication
+        :rtype: publications.objects.PublicationView
+        """
+
+        if pub.rss_stream:
+            return objects.PUB_NOT_FOUND
+
+        text = pub.text or pub.short_text  # TODO: prepare images placeholders
+        return objects.PublicationView(
+            pub_date=pub.publication_date,
+            show_date=pub.show_date,
+            title=pub.title,
+            text=text,
+            categories=self._publication_categories_refs(pub, lang),
+            images=self._publication_images(pub)
+        )
+
+    # def _load_publication
+
+    def _publication_categories_refs(self, pub, lang):
+        pass
+
+    # def _publication_categories_refs
+
+    def _publication_images(self, pub):
+        pass
+
+    # def _publication_images
 
 # class PublicationService

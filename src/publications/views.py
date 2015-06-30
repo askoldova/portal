@@ -10,6 +10,7 @@ from utils import parse_number_or_http_404, pages_range
 from . import STATUS_PUBLISHED, objects, services, STATUS_HIDDEN
 from .publication import FormattedDate
 import generation as gen
+import utils
 
 __author__ = 'andriy'
 
@@ -177,7 +178,16 @@ def generate_old_publication(url, lang, old_id):
 # def generate_old_publication
 
 def _render_publication(url, pub):
-    return gen.EMPTY_GENERATION
+    """
+    :type url: basestring
+    :type pub: publications.objects.PublicationView
+    :rtype: generation.GenerationResult
+    """
+    context = dict(publication=pub)
+    utils.check_exist_and_type(pub, "publication", objects.PublicationView)
+    return gen.GenerationResult(url=url,
+                                content=render_to_string("publication.html",
+                                                         context=context))
 
 # def _render_publication
 
@@ -197,21 +207,21 @@ def generate_publication_by_url(url, lang, year, month, day, slug):
     month = parse_number_or_http_404(month, "Invalid year [{}] value".format(month))
     day = parse_number_or_http_404(day, "Invalid year [{}] value".format(day))
 
-    pub = None # publications_service.get_publication_view_by_url(lang, year, month, day, slug)
-    if pub == objects.PUB_REF_NOT_FOUND:
+    pub = publications_service.get_publication_view_by_url(lang, year, month, day, slug)
+    if pub == objects.PUB_NOT_FOUND:
         raise Http404("Publication is not found")
 
-    _render_publication(url, pub)
+    return _render_publication(url, pub)
 
 # def generate_publication_by_url
 
 def publication_view(request, lang, year, month, day, slug):
-    return generate_publication_by_url(path_of(request), lang, year, month, day, slug).content
+    return HttpResponse(generate_publication_by_url(path_of(request), lang, year, month, day, slug).content)
 
 publication_view_admin = login_required(publication_view)
 
 def old_publication_view(request, lang, old_id):
-    return generate_old_publication(path_of(request), lang=lang, old_id=old_id).content
+    return HttpResponse(generate_old_publication(path_of(request), lang=lang, old_id=old_id).content)
 
 old_publication_view_admin = login_required(old_publication_view)
 
