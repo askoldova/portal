@@ -238,6 +238,7 @@ class PublicationService(object):
 
         text = pub.text or pub.short_text  # TODO: prepare images placeholders
         return objects.PublicationView(
+			url=self._url_of_publication(pub),
             pub_date=pub.publication_date,
             show_date=pub.show_date,
             title=pub.title,

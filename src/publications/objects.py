@@ -59,17 +59,17 @@ class PublicationPreview(collections.namedtuple("PublicationPreview",
 
 
 class PublicationView(collections.namedtuple("PublicationView",
-                                             "pub_date show_date title text "
-                                             "categories imagesi url")):
+                                             "url title pub_date show_date text "
+                                             "categories images")):
     def __new__(cls, pub_date, show_date, title, text, categories, images, url):
         return super(PublicationView, cls).\
             __new__(cls, pub_date=pub_date, show_date=show_date, title=title,
-                    text=text, categories=categories, images=images, url)
+                    text=text, categories=categories, images=images, url=url)
 
     # def __new__
 
 # class PublicationView
 
 
-PUB_NOT_FOUND = PublicationView(pub_date=utils.MIN_DATE, show_date=False,
+PUB_NOT_FOUND = PublicationView(pub_date=utils.MIN_DATE, show_date=False, url='',
                                 title='', text='No text', categories=(), images=())
