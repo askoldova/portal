@@ -1,4 +1,6 @@
 import datetime
+import publications
+import publications.views
 import utils
 
 __author__ = 'andriyg'
@@ -70,7 +72,7 @@ class PublicationService(object):
         :type lang: portal.objects.Language
         :type page_size: long
         :type published: boolean
-        :rtype: publications.objects.Pager
+        :rtype: publications.models.Pager
         """
         if not lang or not isinstance(lang, portal_objs.Language):
             raise ValueError("Language[{}] is not set or not a portal.objects.Language".format(lang))
@@ -85,7 +87,7 @@ class PublicationService(object):
         :type lang: portal.objects.Language
         :type page: long
         :type page_size: long
-        :rtype: publications.objects.Pager
+        :rtype: publications.models.Pager
         """
         if not lang or not isinstance(lang, portal_objs.Language):
             raise ValueError("Language[{}] is not set or not a portal.objects.Language".format(lang))
@@ -188,7 +190,7 @@ class PublicationService(object):
         :param slug: basestring
         :return: publications.objects.PublicationView
         """
-        utils.check_exist_and_type(lang, "lang", portal_objs.Language)
+        publications.check_exist_and_type(lang, "lang", portal_objs.Language)
 
         try:
             publication_id = long(slug)

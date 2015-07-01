@@ -37,6 +37,8 @@ INSTALLED_APPS = (
     'filebrowser',
     'tinymce',
 
+    'utils',
+
     'portal',
     'publications',
     'generation',

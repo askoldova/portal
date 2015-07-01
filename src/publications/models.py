@@ -1,8 +1,10 @@
 import datetime
+
 from django.contrib.auth.models import User
-from . import gen_events, objects
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+
+from . import gen_events
 import generation
 
 __author__ = 'andriy'
@@ -11,7 +13,7 @@ from django.db import models
 from tinymce import models as tinymce
 from filebrowser import fields as filebrowser
 from portal import models as portal
-from . import *
+from . import Pager, STATUS_PUBLISHED, STATUSES, TYPES, STATUS_DRAFT, TYPE_PUBLICATION
 
 
 class RssImportStreamManager(models.Manager):
@@ -65,7 +67,7 @@ class PublicationManager(models.Manager):
 
         pages, remind = self._count_pages(page_size, q)
 
-        return objects.Pager(page_nr=pages, pages=pages, page=tuple(q[:page_size]))
+        return Pager(page_nr=pages, pages=pages, page=tuple(q[:page_size]))
 
     # def pager_and_last_pubs
 
@@ -91,7 +93,7 @@ class PublicationManager(models.Manager):
 
             page_data = tuple(q[_from:_to])
 
-        return objects.Pager(page_nr=page, pages=pages, page=page_data)
+        return Pager(page_nr=page, pages=pages, page=page_data)
 
     def _fix_page_size_and_get_pub_query(self, lang_code, page_size):
         if page_size <= 0:
@@ -106,7 +108,7 @@ class PublicationManager(models.Manager):
 
         pages, remind = self._count_pages(page_size, q)
 
-        return objects.Pager(page_nr=1, pages=pages, page=())
+        return Pager(page_nr=1, pages=pages, page=())
 
     # def pager_all_pubs_to
 
@@ -223,3 +225,4 @@ class Configuration(models.Model):
     def __unicode__(self):
         return u"Configuration"
 # class Configuration
+

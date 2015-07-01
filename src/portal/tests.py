@@ -3,7 +3,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.contrib.sites.models import Site
 from filebrowser.functions import version_generator
-from .service import PortalService
+from .services import PortalService
 
 
 def fake_reverse(self, view_name, *args, **kwargs):

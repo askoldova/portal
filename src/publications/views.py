@@ -6,10 +6,8 @@ from django.template.loader import render_to_string
 from portal.views import path_of, portal_service, generate_concrete_redirect
 from portal import objects as portal_objs
 from publications.publication import dict_of_publication_url_parts
-from utils import parse_number_or_http_404, pages_range
 from . import STATUS_PUBLISHED, objects, services, STATUS_HIDDEN
 import generation as gen
-import utils
 
 __author__ = 'andriy'
 
@@ -183,7 +181,7 @@ def _render_publication(url, pub):
     :rtype: generation.GenerationResult
     """
     context = dict(publication=pub)
-    utils.check_exist_and_type(pub, "publication", objects.PublicationView)
+    publications.views.check_exist_and_type(pub, "publication", objects.PublicationView)
     return gen.GenerationResult(url=url,
                                 content=render_to_string("publication.html",
                                                          context=context))
@@ -225,3 +223,48 @@ def old_publication_view(request, lang, old_id):
 old_publication_view_admin = login_required(old_publication_view)
 
 # === end of publications view ===
+def parse_number_or_http_404(value, error=None):
+    try:
+        return long(value)
+    except ValueError:
+        error = error or "Can't parse numeric value [{}]".format(value)
+        raise Http404(error)
+
+
+def pages_range(pages, page, urlresolver_func, **kwargs):
+    """
+    Should return list of pages from pages to one, not more than 13-15 elements.
+    Have return first page, null value, page-5 up tp page+5 range, null value, last page
+    :type pages int
+    :type page int
+    :rtype list
+    """
+    if pages <= 0:
+        return ()
+    elif pages == 1:
+        kwargs['page'] = 1
+        return (1, urlresolver_func(**kwargs)),
+    if page < 1:
+        page = 1
+    if page > pages:
+        page = pages
+
+    def _page_and_ref(_page):
+        kwargs['page'] = _page
+        return _page, None if _page == page else urlresolver_func(**kwargs)
+    _NONE_REF = ("...", None)
+
+    plist = _page_and_ref(1),
+    if page - 5 > 2:
+        plist += _NONE_REF,
+    range_from = max(2, page-5)
+    range_to = min(page+5, pages-1)
+    for i in range(range_from, range_to+1):
+        plist += _page_and_ref(i),
+    if page + 5 < pages - 1:
+        plist += (_NONE_REF,)
+    plist += _page_and_ref(pages),
+
+    return tuple(reversed(plist))
+
+

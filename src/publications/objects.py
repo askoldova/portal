@@ -1,7 +1,7 @@
 import collections
+
 from portal import objects as portal
-from publications import STATUS_DRAFT
-import utils
+from . import STATUS_DRAFT, Pager, MIN_DATE
 
 __author__ = 'andriy'
 
@@ -37,15 +37,9 @@ class PublicationRef(collections.namedtuple("PublicationRef",
 # class publication_ref
 
 PUB_REF_NOT_FOUND = PublicationRef(publication_id=0, slug='', url='', title='',
-                                   publication_date=utils.MIN_DATE,
+                                   publication_date=MIN_DATE,
                                    language=portal.LANGUAGE_NOT_FOUND, status=STATUS_DRAFT)
 
-
-class Pager(collections.namedtuple("Pager", "page_nr pages page")):
-    def replace_page(self, new_page):
-        return self._replace(page=new_page)
-    # def replace_page
-# class Pager
 
 PAGE_NOT_FOUND = Pager(0, 0, ())
 
@@ -71,5 +65,5 @@ class PublicationView(collections.namedtuple("PublicationView",
 # class PublicationView
 
 
-PUB_NOT_FOUND = PublicationView(pub_date=utils.MIN_DATE, show_date=False,
+PUB_NOT_FOUND = PublicationView(pub_date=MIN_DATE, show_date=False,
                                 title='', text='No text', categories=(), images=())
