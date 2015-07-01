@@ -186,7 +186,7 @@ class PublicationService(object):
         :type month: long
         :type day: long
         :param slug: basestring
-        :return: publications.objects.PublicationView
+        :rtype: publications.objects.PublicationView
         """
         utils.check_exist_and_type(lang, "lang", portal_objs.Language)
 
@@ -208,6 +208,23 @@ class PublicationService(object):
             return objects.PUB_NOT_FOUND
 
         return self._load_publication(lang=lang, pub=pub)
+
+    # def get_publication_view_by_url
+
+    def get_publication_by_id(self, publication_id):
+        """
+        :type publication_id: long
+        :rtype: publications.objects.PublicationView
+        """
+        utils.check_exist_and_type(publication_id, "publication_id", long, int)
+
+        try:
+            pub = models.Publication.objects.get_by_id(publication_id=publication_id)
+        except models.Publication.DoesNotExist:
+            return objects.PUB_NOT_FOUND
+
+        return self._load_publication(pub=pub, lang=self.portal_service.get_language(pub.locale.code))
+    # def get_publication_view_by_id
 
     def _load_publication(self, lang, pub):
         """
@@ -240,5 +257,6 @@ class PublicationService(object):
         pass
 
     # def _publication_images
+
 
 # class PublicationService

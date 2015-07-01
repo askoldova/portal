@@ -146,7 +146,7 @@ def url_of_publication(lang, publication_date, publication_id, slug):
 
 
 def url_of_old_publication(lang_code, old_id):
-    return urlresolvers.reverse(old_publication_view, kwargs=dict(lang=lang_code, id=str(old_id)))
+    return urlresolvers.reverse(old_publication_view, kwargs=dict(lang=lang_code, old_id=str(old_id)))
 
 def url_of_publication_by_id(publication_id):
     publication = publications_service.get_publication_ref_by_id(publication_id)
@@ -194,7 +194,7 @@ def generate_publication_by_id(publication_id):
     publication_id = parse_number_or_http_404(publication_id,
                                               "Invalid publication_id [{}] value".format(publication_id))
 
-    publication = None # publications_service.get_publication_by_id(publication_id)
+    publication = publications_service.get_publication_by_id(publication_id)
     return _render_publication(None, publication)
 
 # def generate_publication_by_id
