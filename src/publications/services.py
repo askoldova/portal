@@ -1,7 +1,6 @@
 import datetime
 import publications
 import publications.views
-import utils
 
 __author__ = 'andriyg'
 
