@@ -47,7 +47,7 @@ def save_generation(generation):
     if generation == EMPTY_GENERATION:
         return
 
-    url = generation.url
+    url = generation.url or ''
     if url.endswith("/") or not url.endswith(".html") or not url.endswith(".htm"):
         url += "/index.html"
 
