@@ -195,7 +195,7 @@ def generate_publication_by_id(publication_id):
                                               "Invalid publication_id [{}] value".format(publication_id))
 
     publication = publications_service.get_publication_by_id(publication_id)
-    return _render_publication(None, publication)
+    return _render_publication(publication.url, publication)
 
 # def generate_publication_by_id
 

@@ -60,11 +60,11 @@ class PublicationPreview(collections.namedtuple("PublicationPreview",
 
 class PublicationView(collections.namedtuple("PublicationView",
                                              "pub_date show_date title text "
-                                             "categories images")):
-    def __new__(cls, pub_date, show_date, title, text, categories, images):
+                                             "categories imagesi url")):
+    def __new__(cls, pub_date, show_date, title, text, categories, images, url):
         return super(PublicationView, cls).\
             __new__(cls, pub_date=pub_date, show_date=show_date, title=title,
-                    text=text, categories=categories, images=images)
+                    text=text, categories=categories, images=images, url)
 
     # def __new__
 
