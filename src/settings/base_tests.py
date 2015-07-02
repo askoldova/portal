@@ -17,3 +17,5 @@ CACHES = dict(
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "tests/media")
 FILEBROWSER_MEDIA_ROOT = MEDIA_ROOT
+
+PAGE_GENERATION_MODE = "none"

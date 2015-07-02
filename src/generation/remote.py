@@ -6,7 +6,7 @@ from _celery.celery import app
 
 __author__ = 'andriyg'
 
-if not settings.REMOTE_GENERATIONS:
+if not settings.PAGE_GENERATION_MODE:
     _logger = logging.getLogger(__file__)
 else:
     _logger = app.log.get_default_logger(__file__)
@@ -56,7 +56,7 @@ def _generate(m, command):
 
 def schedule_generation(command):
     for m in _load_modules():
-        if not settings.REMOTE_GENERATIONS:
+        if settings.PAGE_GENERATION_MODE == "remote":
             result = _generate(m, command)
         else:
             result = _generate_silent(m, command)

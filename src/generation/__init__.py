@@ -16,10 +16,10 @@ def apply_generation_task(command):
     if None == command:
         raise ValueError("Scheduled command have not be empty")
 
-    if not settings.REMOTE_GENERATIONS:
+    if settings.PAGE_GENERATION_MODE == "local":
         from . import remote
         remote.schedule_generation(command)
-    else:
+    elif settings.PAGE_GENERATION_MODE == "remote":
         _schedule_generation.apply_async((command,))
 # def apply_generation_task
 

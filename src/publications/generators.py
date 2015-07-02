@@ -11,9 +11,9 @@ def _generate_internal(command1):
 
 
 def apply_internal(command):
-    if not settings.REMOTE_GENERATIONS:
+    if settings.PAGE_GENERATION_MODE == "local":
         accept_and_generate(command)
-    else:
+    elif settings.PAGE_GENERATION_MODE == "remote":
         _generate_internal.apply_async((command,))
 # def apply_internal
 

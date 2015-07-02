@@ -190,7 +190,7 @@ TINYMCE_FILEBROWSER = True
 
 # portal configuration
 
-REMOTE_GENERATIONS = False
+PAGE_GENERATION_MODE = "local"
 
 PORTAL_DEFAULT_REDIRECT_VIEW = 'pubs_all_publications'
 

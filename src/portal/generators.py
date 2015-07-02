@@ -8,10 +8,11 @@ from portal import gen_events
 __author__ = 'andriy'
 
 
-if not settings.REMOTE_GENERATIONS:
-    _logger = logging.getLogger(__file__)
-else:
+if settings.PAGE_GENERATION_MODE == "remote":
     _logger = app.log.get_default_logger(__file__)
+else:
+    _logger = logging.getLogger(__file__)
+
 
 def generate_site():
     apply_internal(gen_events.DefaultPageGenerate)
@@ -22,7 +23,7 @@ def _generate_internal(command1):
 
 def apply_internal(command):
 
-    if not settings.REMOTE_GENERATIONS:
+    if not settings.PAGE_GENERATION_MODE:
         accept_and_generate(command)
     else:
         _generate_internal.apply_async((command,))

@@ -1,9 +1,7 @@
-import os
-from django.conf import settings
 from django.test import TestCase
 from django.contrib.sites.models import Site
-from filebrowser.functions import version_generator
-from . import services
+from . import services, models
+from portal import models as portal_m
 from portal.services import PortalService
 
 def fake_reverse(self, view_name, *args, **kwargs):
@@ -32,7 +30,7 @@ resolver = ResolverStub()
 pubs_service = services.PublicationService(urls_resolver=resolver, portal_service=PortalService)
 pubs_service.portal_service.reverse = fake_reverse
 
-
+uk = None
 def _setup():
     site = Site.objects.get_current()
 
@@ -53,6 +51,14 @@ def _setup():
     site2.save()
 
     print(site2.id, " ", site2.name, " ", site2.domain)
+
+    global uk
+    try:
+        uk = portal_m.Lang.objects.get(code="UK")
+    except portal_m.Lang.DoesNotExist:
+        uk = portal_m.Lang.objects.create(code="UK", caption="Ukrainian", default=True)
+
+    print("Default language: ", uk)
 
     return site, site2
 # def _setup
@@ -75,3 +81,16 @@ class PublicationsServicesTest(TestCase):
     # def test_url
 
 # class CoreServiceTest
+
+class AllPublicationsTest(TestCase):
+    def __init__(self, methodName='runTest'):
+        super(AllPublicationsTest, self).__init__(methodName)
+
+    def setUp(self):
+        _setup()
+
+        menu = portal_m.MainMenu.objects.create(locale=uk, caption="menu1")
+        menu_item = portal_m.MenuItem.objects.create(locale=uk, caption="menu1", menu=menu)
+
+    def test_paginate(self):
+        pass
