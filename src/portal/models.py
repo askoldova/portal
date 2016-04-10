@@ -14,7 +14,8 @@ class LangManager(models.Manager):
     def get_by_code(self, code):
         return self.get(code=code)
 
-    # def get_by_code
+        # def get_by_code
+
 
 # def LangManager
 
@@ -28,7 +29,7 @@ class Lang(models.Model):
         super(Lang, self).save(force_insert, force_update, using, update_fields)
 
         generation.apply_generation_task(gen_events.DefaultPageGenerate(self.lower_code))
-        generation.apply_generation_task(gen_events.IndexPageGenerate(),)
+        generation.apply_generation_task(gen_events.IndexPageGenerate(), )
 
     objects = LangManager()
 
@@ -40,8 +41,11 @@ class Lang(models.Model):
     lower_code = property(lambda self: self.code.lower())
 
     class Meta:
-        ordering=("-default", "caption", )
+        ordering = ("-default", "caption",)
+
+
 # def class Lang
+
 
 class LangLocaleManager(models.Manager):
     def get_lang_locale(self, lang, locale):
@@ -52,9 +56,14 @@ class LangLocaleManager(models.Manager):
 
         return self.get(lang=lang, locale=locale)
 
-    # def lang_locale
+        # def lang_locale
+
+    def get_queryset(self):
+        return super(LangLocaleManager, self).get_queryset().prefetch_related("locale")
+
 
 # def class LangLocaleManager
+
 
 class LangLocale(models.Model):
     lang = models.ForeignKey(to=Lang)
@@ -67,12 +76,14 @@ class LangLocale(models.Model):
         return u"%s>%s %s" % (self.lang.code, self.locale.code, self.caption)
 
     class Meta:
-        unique_together=(("lang", "locale"), )
+        unique_together = (("lang", "locale"),)
+
+
 # def class LangLocale
+
 
 class MainMenu(models.Model):
     caption = models.CharField(max_length=100, unique=True)
-    locale = models.ForeignKey(to=Lang)
     order = models.SmallIntegerField(default=0)
     hidden = models.BooleanField(default=False)
     width = models.CharField(max_length=10, null=True, blank=True)
@@ -81,13 +92,23 @@ class MainMenu(models.Model):
         ordering = ("hidden", "order", "caption")
 
     def __unicode__(self):
-        return u'%s(%s)' % (self.caption, self.locale.code)
+        return u'%s' % (self.caption,)
+
+
 # def MainMenu
+
+
+class MainMenuI18nManager(models.Manager):
+    def get_queryset(self):
+        return super(MainMenuI18nManager, self).get_queryset().prefetch_related("locale")
+
 
 class MainMenuI18n(models.Model):
     menu = models.ForeignKey(to=MainMenu)
     caption = models.CharField(max_length=100)
     locale = models.ForeignKey(to=Lang)
+
+    objects = MainMenuI18nManager()
 
     class Meta:
         unique_together = (('menu', 'locale'), ('menu', 'caption'),)
@@ -96,27 +117,45 @@ class MainMenuI18n(models.Model):
     def __unicode__(self):
         return u'%s>(%s) %s' % (self.menu.caption, self.locale.code, self.caption)
 
+
 # def MainMenuI18n
+
+
+class MenuItemManager(models.Manager):
+    def get_queryset(self):
+        return super(MenuItemManager, self).get_queryset().prefetch_related("menu")
+
 
 class MenuItem(models.Model):
     menu = models.ForeignKey(to=MainMenu)
     caption = models.CharField(max_length=100)
-    locale = models.ForeignKey(to=Lang)
     order = models.SmallIntegerField(default=0)
 
+    objects = MenuItemManager()
+
     class Meta:
-        unique_together = ('menu', 'caption', 'locale')
+        unique_together = ('menu', 'caption')
         ordering = ('menu__hidden', 'menu__order', 'order', 'caption')
 
     def __unicode__(self):
-        return u'%s-%s(%s)' % (self.menu.caption, self.caption, self.locale.code)
+        return u'%s-%s' % (self.menu.caption, self.caption)
+
 # def MenuItem
+
+
+class MenuItemI18nManager(models.Manager):
+    def get_queryset(self):
+        return super(MenuItemI18nManager, self).get_queryset().\
+            prefetch_related("menu_item", "menu_item__menu", "locale")
+
 
 class MenuItemI18n(models.Model):
     menu = models.ForeignKey(to=MainMenu)
     menu_item = models.ForeignKey(to=MenuItem)
     caption = models.CharField(max_length=100)
     locale = models.ForeignKey(to=Lang)
+
+    objects = MenuItemI18nManager()
 
     class Meta:
         unique_together = (('menu_item', 'locale'), ('menu', 'caption', 'locale'))

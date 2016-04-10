@@ -1,7 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib import admin
 from django.http import HttpResponseRedirect
+
 from . import models
+
 
 class GenerationAdmin(admin.ModelAdmin):
     actions = []
@@ -16,9 +18,9 @@ class GenerationAdmin(admin.ModelAdmin):
         # noinspection PyProtectedMember
         opts = self.model._meta
         info = opts.app_label, (opts.model_name if hasattr(opts, 'model_name') else opts.module_name)
-        return patterns('',
+        return [
             url('^$', self.admin_site.admin_view(self.view), name='{0}_{1}_changelist'.format(*info)),
-        )
+        ]
 
     def view(self, request):
         return HttpResponseRedirect('/')

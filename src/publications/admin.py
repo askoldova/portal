@@ -49,9 +49,9 @@ class PublicationAdmin(admin.ModelAdmin):
         """
         if obj:
             year = "%04d" % (obj.publication_date.year,)
-            month = "%02d" % (obj.publication_date.month + 1,)
+            month = "%02d" % (obj.publication_date.month,)
             day = "%02d" % (obj.publication_date.day,)
-            slug = obj.slug or str(obj.old_id) or str(obj.id)
+            slug = obj.slug or str(obj.id)
             return urlresolvers.reverse('pubs_publication_preview',
                                         kwargs=dict(lang=obj.locale.code.lower(), year=year, month=month, day=day,
                                                     slug=slug))

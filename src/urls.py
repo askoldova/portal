@@ -25,7 +25,7 @@ urlpatterns = [
 
     url(index_url.format(PREVIEW), portal.index_view_admin, name='portal_index_preview'),
     url(all_publications_url.format(PREVIEW),
-        pubs.old_publication_view_admin),
+        pubs.all_publications_view_admin),
     url(all_publications_url.format(PREVIEW),
         pubs.all_publications_view_admin, name='pubs_all_publications_preview'),
     url(all_publications_page_url.format(PREVIEW),

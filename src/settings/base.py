@@ -190,8 +190,6 @@ TINYMCE_FILEBROWSER = True
 
 # portal configuration
 
-PAGE_GENERATION_MODE = "local"
-
 PORTAL_DEFAULT_REDIRECT_VIEW = 'pubs_all_publications'
 
 REDIRECT_HTML_TIMEOUT = 30

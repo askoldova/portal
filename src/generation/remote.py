@@ -2,14 +2,10 @@ import logging
 from django.apps import apps
 import imp
 from django.conf import settings
-from _celery.celery import app
 
 __author__ = 'andriyg'
 
-if not settings.PAGE_GENERATION_MODE:
-    _logger = logging.getLogger(__file__)
-else:
-    _logger = app.log.get_default_logger(__file__)
+_logger = logging.getLogger(__file__)
 
 _modules = ()
 def _load_modules_int(logger):

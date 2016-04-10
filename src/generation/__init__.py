@@ -1,27 +1,10 @@
 import codecs
 import collections
 import os
-from _celery.celery import app
 
 from django.conf import settings
 
 __author__ = 'andriy'
-
-@app.task(name="generation._generate_internal")
-def _schedule_generation(command1):
-    from . import remote
-    remote.schedule_generation(command1)
-
-def apply_generation_task(command):
-    if None == command:
-        raise ValueError("Scheduled command have not be empty")
-
-    if settings.PAGE_GENERATION_MODE == "local":
-        from . import remote
-        remote.schedule_generation(command)
-    elif settings.PAGE_GENERATION_MODE == "remote":
-        _schedule_generation.apply_async((command,))
-# def apply_generation_task
 
 
 class GenerationResult(collections.namedtuple("GenerationResult", "url content")):

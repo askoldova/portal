@@ -1,11 +1,11 @@
 from django.conf import settings
-from _celery.celery import app
-from . import gen_events, views
+
 import generation as gen
+from . import gen_events, views
 
 publications_service = views.publications_service
 
-@app.task(name="portal.generators._generate_internal")
+
 def _generate_internal(command1):
     accept_and_generate(command1)
 
@@ -15,6 +15,8 @@ def apply_internal(command):
         accept_and_generate(command)
     elif settings.PAGE_GENERATION_MODE == "remote":
         _generate_internal.apply_async((command,))
+
+
 # def apply_internal
 
 
@@ -30,6 +32,7 @@ def _generate_publication(command):
     if ref.old_id:
         apply_internal(gen_events.OldPublicationGenerate(old_id=ref.old_id, lang_code=ref.language.lower_code))
 
+
 # def generate_publication
 
 def _generate_all_pubs_default(command):
@@ -39,6 +42,7 @@ def _generate_all_pubs_default(command):
     gen.save_generation(
         views.generate_all_publications(
             views.url_of_all_publications(command.language_code), command.language_code))
+
 
 # def generate_all_pubs_default
 
@@ -50,6 +54,7 @@ def _generate_old_publication(command):
     gen.save_generation(
         views.generate_old_publication(url=url, lang=command.lang_code, old_id=command.old_id)
     )
+
 
 def accept_and_generate(command):
     """
@@ -67,4 +72,5 @@ def accept_and_generate(command):
         return True
 
     return False  # default return - command can't be handled by
+
 # def accept_and_generate

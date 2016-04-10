@@ -16,7 +16,7 @@ DELETE FROM publications_publicationsubcategory WHERE id > 0;
 DELETE FROM publications_publication WHERE id > 0;
 DELETE FROM publications_rssimportstream WHERE id > 0;
 
-INSERT INTO `askoldovadev`.`publications_rssimportstream`
+INSERT INTO `publications_rssimportstream`
 (`id`,
 `enabled`,
 `rss_url`,
@@ -32,18 +32,18 @@ FROM load_askoldova.rss_feeds;
 
 INSERT INTO `publications_publication`
 (
-	state, publication_date, show_date, slug, `type`, 
-    title, short_text, text, rss_stream, rss_url, 
+	state, publication_date, show_date, slug, `type`,
+    title, short_text, text, rss_stream_id, rss_url,
     old_id, author_id, locale_id, subcategory_id
 )
-SELECT 
-	pbi_state, pbi_date, pbi_show_date, null, p.pub_type, 
-    pbi_title, pbi_text_short, pbi_text, pi.pbi_rss_id, pi.pbi_rss_url, 
-    pbi_id, 
+SELECT
+	pbi_state, pbi_date, pbi_show_date, null, p.pub_type,
+    pbi_title, pbi_text_short, pbi_text, pi.pbi_rss_id, pi.pbi_rss_url,
+    pbi_id,
     (SELECT id FROM auth_user WHERE username = pbi_author),
 	(SELECT id FROM portal_lang WHERE code = UPPER(pbi_lang_id)),
 	(SELECT psc_sct_id FROM load_askoldova.pub_subcats WHERE psc_order = 0 AND psc_pub_id = pub_id)
-FROM load_askoldova.publications p 
+FROM load_askoldova.publications p
 INNER JOIN load_askoldova.pub_items pi ON pbi_pub_id = pub_id
 WHERE NOT EXISTS (SELECT id FROM publications_publication WHERE id = pub_id);
 
@@ -51,8 +51,8 @@ INSERT INTO `publications_publicationsubcategory`
 (id,
 `publication_id`,
 `subcategory_id`)
-SELECT psc_id, p.id, psc_sct_id 
-FROM load_askoldova.pub_subcats 
+SELECT psc_id, p.id, psc_sct_id
+FROM load_askoldova.pub_subcats
 INNER JOIN publications_publication p ON psc_pub_id = p.old_id
 WHERE psc_order > 0
 ORDER BY psc_order;
@@ -63,9 +63,7 @@ INSERT INTO `publications_publicationimage`
 `caption`,
 `name`,
 `publication_id`)
-SELECT DISTINCT max(img_id), img_file_name, null, img_name, p.id 
+SELECT DISTINCT max(img_id), img_file_name, null, img_name, p.id
 FROM load_askoldova.images
 INNER JOIN publications_publication p ON img_pub_id = p.old_id
 GROUP BY img_file_name, img_name, p.id;
-
-

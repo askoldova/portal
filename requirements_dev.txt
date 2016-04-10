@@ -1,4 +1,4 @@
-django<1.9
+django<1.10
 django-debug-toolbar
 teamcity-messages>=1.8
 nose
