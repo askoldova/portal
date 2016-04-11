@@ -1,7 +1,7 @@
 import types
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-
 from django.core import urlresolvers
 from django.http import HttpResponse, Http404
 from django.template import loader, Context
@@ -11,6 +11,7 @@ from portal import objects
 from . import services
 
 portal_service = services.PortalService()
+
 
 def path_of(request):
     return request.META['PATH_INFO'] if 'PATH_INFO' in request.META else ''
@@ -47,10 +48,13 @@ def generate_index(url):
     return generate_concrete_redirect(url, settings.PORTAL_DEFAULT_REDIRECT_VIEW, view_args=(),
                                       view_kwargs=dict(lang=lang.code.lower()))
 
+
 def index_view(url):
     return HttpResponse(generate_index(url).content)
 
+
 index_view_admin = login_required(index_view)
+
 
 def index_url():
     return urlresolvers.reverse(index_view)

@@ -1,28 +1,34 @@
+{% extends "design.html" %}
 {% load i18n %}
-<div>
+{% block content %}
+    <div class="contentheading">{{ title }}</div>
+    <div>
     {% for p in page %}
         <div>
-        <h4><a href="{{ p.url }}">{{ p.title }}</a></h4>
+            <h1><a href="${{ p.url }}">{{ p.title }}</a></h1>
         {% if p.show_date %}
-            <div style="text-align: right;">{{ p.publication_date | date }}</div>
+            <p><span class="date">{{ p.publication_date | date:"Y-m-d" }}</span></p>
         {% endif %}
-        <p>
-            {{ p.short_text | safe }}
-        </p>
-        <div style="text-align: right;"><a href="{{ p.url }}">
+        {{ p.short_text | safe }}
+        <p>{% for sc in p.categories %}
+            {% if not forloop.first %}, {% endif %}
+            <a href="{{ s.url }}" class="category">{{ s.title }}</a>
+        {% empty %}
+            === No subcategories set ===
+        {% endfor %}</p>
+        <p class="readon_split"><a href="{{ p.url }}">
             {% if p.custom_link_name %}
                 {{ p.custom_link_name }}
             {% else %}
                 {% trans "Read more..." %}
             {% endif %}</a>
-        </div>
+        </p>
+
     </div>
     {% endfor %}
 </div>
-<div>
-    {{ navigate_url }}
+    <div class="paginator" id="paginator">
     <p>
-    Pager:
     {% for p, url in pages_range %}
         {% if url %}
             <a href="{{ url }}">{{ p }}</a>
@@ -31,5 +37,10 @@
         {% endif %}&nbsp;
     {% endfor %}
     </p>
-    <p>Page #: {{ page_nr }}</p>
-</div>
+    </div>
+    <div class="paginator_pages">{{ pages }} сторінок</div>
+    <script type="text/javascript">
+        var p = new Paginator('paginator', {{ pages }}, 15, {{ page_nr }}, '{{ navigate_url }}');
+    </script>
+    </div>
+{% endblock %}

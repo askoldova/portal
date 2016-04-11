@@ -1,1 +1,8 @@
-{{ publication }}
+{% extends "design.html" %}
+
+{% block title %}{{ publication.title }}{% endblock %}
+
+{% block content %}
+    {{ publication.pub_date | date:"Y-m-d" }}
+    {{ publication.text | safe }}
+{% endblock %}

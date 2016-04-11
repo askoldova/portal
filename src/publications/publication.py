@@ -3,6 +3,7 @@ import datetime
 
 __author__ = 'andriyg'
 
+
 class FormattedDate(collections.namedtuple("FormattedDate", "year month day")):
     def __new__(cls, date):
         """
@@ -13,7 +14,8 @@ class FormattedDate(collections.namedtuple("FormattedDate", "year month day")):
         return super(FormattedDate, cls).__new__(cls, year="{:04}".format(date.year),
                                                  month="{:02}".format(date.month),
                                                  day="{:02}".format(date.day))
-    # def __new__
+        # def __new__
+
 
 # class FormattedDate
 
@@ -33,5 +35,5 @@ def dict_of_publication_url_parts(lang, publication_date, publication_id, slug):
         day=date.day,
         slug=str(slug or publication_id)
     )
-# dict_of_publication_url_parts
 
+# dict_of_publication_url_parts
