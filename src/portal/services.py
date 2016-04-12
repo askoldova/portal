@@ -4,6 +4,8 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 import filebrowser
 from filebrowser import functions as fbfunctions
+
+import core
 from . import models, objects
 
 __author__ = 'andriy'
@@ -185,4 +187,22 @@ class PortalService(object):
                      for lang in models.Lang.objects.all())
 
     # def get_languages
+
+    def subcategory_ref(self, subcategory_code, lang_code):
+        core.check_exist_and_type(subcategory_code, "subcategory_code", long, int)
+        core.check_exist_and_type(lang_code, "lang_code", str, unicode)
+
+        lang = self.get_language(lang_code)
+        try:
+            m = models.MenuItemI18n.objects.by_code_and_lang(subcategory_code, lang_code)
+            return objects.MenuItemRef(m.menu_item.code, m.text, lang)
+        except models.MainMenuI18n.DoesNotExist:
+            try:
+                m = models.MenuItem.objects.by_code(subcategory_code)
+                return objects.MenuItemRef(m.code, m.caption, lang)
+            except models.MenuItem.DoesNotExist:
+                return objects.MENU_ITEM_NOT_EXIST()
+
+
+
 # class PortalService

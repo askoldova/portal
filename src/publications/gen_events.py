@@ -1,5 +1,5 @@
 from portal.gen_events import *
-from . import check_exist_and_type
+from core import check_exist_and_type
 
 __author__ = 'andriyg'
 

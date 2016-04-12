@@ -1,5 +1,6 @@
 import collections
 import datetime
+
 from django.utils.translation import gettext_lazy as _
 
 __author__ = 'andriy'
@@ -35,16 +36,3 @@ class Pager(collections.namedtuple("Pager", "page_nr pages page")):
     # def replace_page
 
 
-def check_exist_and_type(value, name, _type, *types):
-    types = types or ()
-    if None != _type:
-        types = (_type,) + types
-
-    if not value:
-        raise ValueError("{} value is not set".format(name))
-    if not types:
-        return
-    for t in types:
-        if isinstance(value, t):
-            return
-    raise ValueError("{} value [{}] is not one of {}".format(name, value, types))

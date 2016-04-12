@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-from . import gen_events
 import generation
+from . import gen_events
 
 __author__ = 'andriy'
 
@@ -31,6 +31,7 @@ class RssImportStream(models.Model):
 
     objects = RssImportStreamManager()
 
+
 # enc class RssImportStream
 
 
@@ -40,7 +41,7 @@ class PublicationManager(models.Manager):
         :type publication_id: long
         :rtype: publications.models.Publication
         """
-        return self.get(id = publication_id)
+        return self.get(id=publication_id)
 
     # def get_by_id
 
@@ -60,6 +61,7 @@ class PublicationManager(models.Manager):
         if remind > 0:
             pages += 1
         return pages, remind
+
     # def `_count_pages
 
     def pager_and_last_pubs(self, page_size, lang_code):
@@ -123,11 +125,12 @@ class PublicationManager(models.Manager):
         """
         next_pub_date = publication_date + datetime.timedelta(days=1)
         return self.filter(locale__code=lang_code.upper(),
-                        publication_date__gte=publication_date,
-                        publication_date__lt=next_pub_date).\
-                    filter(Q(id=publication_id) | Q(slug=slug)).get()
+                           publication_date__gte=publication_date,
+                           publication_date__lt=next_pub_date). \
+            filter(Q(id=publication_id) | Q(slug=slug)).get()
 
-    # def get_by_lang_date_slug
+        # def get_by_lang_date_slug
+
 
 # class PublicationManager
 
@@ -165,14 +168,16 @@ class Publication(models.Model):
 
     class Meta:
         unique_together = (("rss_stream", "rss_url"), ("publication_date", "slug"),)
-        index_together = (("state", "publication_date"),("state", "subcategory", "publication_date"),)
+        index_together = (("state", "publication_date"), ("state", "subcategory", "publication_date"),)
         ordering = ("-publication_date",)
+
 
 # class Publication
 
 
 class PublicationSubcategoryManager(models.Manager):
-    pass
+    def find_by_publication(self, pub):
+        [f.subcategory for f in self.filter(publication__exact=pub)]
 
 
 class PublicationSubcategory(models.Model):
@@ -197,6 +202,8 @@ class PublicationImage(models.Model):
     class Meta:
         unique_together = (("publication", "file"),)
         ordering = ("id",)
+
+
 # class PublicationImage
 
 
@@ -212,7 +219,9 @@ class ConfigurationManager(models.Manager):
             conf.save()
             return conf
 
-    # def get_configuration
+            # def get_configuration
+
+
 # class ConfigurationManager
 
 
@@ -224,5 +233,5 @@ class Configuration(models.Model):
 
     def __unicode__(self):
         return u"Configuration"
-# class Configuration
 
+# class Configuration

@@ -1,3 +1,5 @@
+from core import bool_env
+
 __author__ = 'andriyg'
 
 # noinspection PyUnresolvedReferences

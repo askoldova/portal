@@ -5,6 +5,7 @@ from django.core import urlresolvers
 from django.http import HttpResponse, Http404
 from django.template.loader import render_to_string
 
+import core
 import generation as gen
 import publications
 from portal import objects as portal_objs
@@ -207,7 +208,7 @@ def _render_publication(url, pub):
     :rtype: generation.GenerationResult
     """
     context = dict(publication=pub)
-    publications.check_exist_and_type(pub, "publication", objects.PublicationView)
+    core.check_exist_and_type(pub, "publication", objects.PublicationView)
     return gen.GenerationResult(url=url,
                                 content=render_to_string("publication.html",
                                                          context=context))

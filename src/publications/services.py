@@ -1,4 +1,6 @@
 import datetime
+
+import core
 import publications
 import publications.views
 
@@ -17,6 +19,8 @@ class UrlsResolver:
     def get_old_publication_url(self, lang_code, old_id):
         raise NotImplemented()
 
+    def get_subcategory_url(self, language_code, subcategory_id):
+        raise NotImplemented()
 # class UrlsResolver
 
 
@@ -62,7 +66,9 @@ class PublicationService(object):
                                                      publication_date=pub.publication_date, slug=pub.slug)
         return objects.PublicationRef(language=locale, publication_id=pub.id,
                                       old_id=pub.old_id, publication_date=pub.publication_date, slug=pub.slug,
-                                      title=pub.title, url=url, status=pub.state)
+                                      title=pub.title, url=url, status=pub.state,
+                                      categories=self._publication_categories_refs(pub, locale)
+                                      )
 
     # def _load_pub_ref
 
@@ -77,7 +83,7 @@ class PublicationService(object):
             raise ValueError("Language[{}] is not set or not a portal.objects.Language".format(lang))
 
         pager = models.Publication.objects.pager_and_last_pubs(page_size=page_size, lang_code=lang.code)
-        return pager.replace_page(tuple(self._publication_preview(p) for p in pager.page))
+        return pager.replace_page(tuple(self._publication_preview(p, lang) for p in pager.page))
 
     # def get_last_publications
 
@@ -96,13 +102,15 @@ class PublicationService(object):
         pager = models.Publication.objects.pager_and_all_pubs_page(page=page, page_size=page_size, lang_code=lang.code)
         if not pager.page:
             return objects.PAGE_NOT_FOUND
-        return pager.replace_page(tuple(self._publication_preview(p) for p in pager.page))
+        return pager.replace_page(tuple(self._publication_preview(p, lang) for p in pager.page))
 
     # def get_publications_page
 
-    def _publication_preview(self, pub):
+    def _publication_preview(self, pub, lang):
         if not pub or not isinstance(pub, models.Publication):
             raise ValueError("Publication[{}] is not set or not a portal.models.Publication".format(pub))
+
+        core.check_exist_and_type(lang, "lang", portal_objs.Language)
 
         if pub.rss_url and pub.rss_stream:
             url=pub.rss_url
@@ -115,7 +123,8 @@ class PublicationService(object):
                                           custom_link_name=custom_link_name,
                                           short_text=pub.short_text, published=self._is_published(pub),
                                           publication_date=pub.publication_date,
-                                          show_date=pub.show_date)
+                                          show_date=pub.show_date,
+                                          categories=self._publication_categories_refs(pub, lang))
 
     # def _publication_preview
 
@@ -189,7 +198,7 @@ class PublicationService(object):
         :param slug: basestring
         :rtype: publications.objects.PublicationView
         """
-        publications.check_exist_and_type(lang, "lang", portal_objs.Language)
+        core.check_exist_and_type(lang, "lang", portal_objs.Language)
 
         try:
             publication_id = long(slug)
@@ -217,7 +226,7 @@ class PublicationService(object):
         :type publication_id: long
         :rtype: publications.objects.PublicationView
         """
-        utils.check_exist_and_type(publication_id, "publication_id", long, int)
+        core.check_exist_and_type(publication_id, "publication_id", long, int)
 
         try:
             pub = models.Publication.objects.get_by_id(publication_id=publication_id)
@@ -239,7 +248,7 @@ class PublicationService(object):
 
         text = pub.text or pub.short_text  # TODO: prepare images placeholders
         return objects.PublicationView(
-			url=self._url_of_publication(pub),
+            url=self._url_of_publication(pub),
             pub_date=pub.publication_date,
             show_date=pub.show_date,
             title=pub.title,
@@ -251,7 +260,13 @@ class PublicationService(object):
     # def _load_publication
 
     def _publication_categories_refs(self, pub, lang):
-        pass
+        """
+        :type lang: portal.objects.Language
+        :type pub: publications.models.Publication
+        """
+        subcategories = [pub.subcategory]
+        subcategories += models.PublicationSubcategory.objects.find_by_publication(pub) or []
+        return [self.subcategory_ref(f, lang) for f in subcategories]
 
     # def _publication_categories_refs
 
@@ -260,5 +275,9 @@ class PublicationService(object):
 
     # def _publication_images
 
+    def subcategory_ref(self, subcategory, lang):
+        sub = self.portal_service.subcategory_ref(subcategory.id, lang.code)
+        url = self.urls_resolver.get_subcategory_url(lang.code, subcategory.id)
+        objects.SubcategoryRef(lang.lower_code, subcategory.code, sub.caption)
 
 # class PublicationService

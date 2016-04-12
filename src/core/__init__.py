@@ -1,6 +1,21 @@
 import os
 
 
+def check_exist_and_type(value, name, _type, *types):
+    types = types or ()
+    if None != _type:
+        types = (_type,) + types
+
+    if not value:
+        raise ValueError("{} value is not set".format(name))
+    if not types:
+        return
+    for t in types:
+        if isinstance(value, t):
+            return
+    raise ValueError("{} value [{}] is not one of {}".format(name, value, types))
+
+
 def env(key, default=None, transform=lambda x: x):
     """
     :type key: str
@@ -10,8 +25,6 @@ def env(key, default=None, transform=lambda x: x):
     """
     return transform(os.environ[key]) if key in os.environ else default
 
-# def env
-
 
 def int_env(key, default=None):
     """
@@ -20,8 +33,6 @@ def int_env(key, default=None):
     :rtype: int
     """
     return env(key, default=default, transform=lambda x: None if not x else int(x))
-
-# def int_env
 
 
 def bool_env(key, default=False):
@@ -44,7 +55,6 @@ def bool_env(key, default=False):
 
     return env(key, default=default, transform=__parse_bool)
 
-# def bool_env
 
 def list_env(key, default=()):
     """

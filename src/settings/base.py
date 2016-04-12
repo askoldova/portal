@@ -1,6 +1,6 @@
 import os
 from django.utils.translation import ugettext_lazy as _
-from env import env, int_env, bool_env, list_env
+from core import env, int_env, bool_env, list_env
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
