@@ -4,6 +4,7 @@ from . import services, models
 from portal import models as portal_m
 from portal.services import PortalService
 
+
 def fake_reverse(self, view_name, *args, **kwargs):
     return u'/name=%s/args=%s/kwargs%s' % (view_name, args, kwargs)
 
@@ -31,6 +32,8 @@ pubs_service = services.PublicationService(urls_resolver=resolver, portal_servic
 pubs_service.portal_service.reverse = fake_reverse
 
 uk = None
+
+
 def _setup():
     site = Site.objects.get_current()
 
@@ -61,6 +64,8 @@ def _setup():
     print("Default language: ", uk)
 
     return site, site2
+
+
 # def _setup
 
 
@@ -72,13 +77,15 @@ class PublicationsServicesTest(TestCase):
         super(PublicationsServicesTest, self).setUp()
 
         self.site, self.site2 = _setup()
+
     # def __init__
 
     def test_url(self):
         site2 = self.site2
         site = self.site
 
-    # def test_url
+        # def test_url
+
 
 # class CoreServiceTest
 
@@ -89,8 +96,8 @@ class AllPublicationsTest(TestCase):
     def setUp(self):
         _setup()
 
-        menu = portal_m.MainMenu.objects.create(locale=uk, caption="menu1")
-        menu_item = portal_m.MenuItem.objects.create(locale=uk, caption="menu1", menu=menu)
+        menu = portal_m.MainMenu.objects.create(caption="menu1")
+        portal_m.MenuItem.objects.create(caption="menu1", menu=menu)
 
     def test_paginate(self):
         pass
