@@ -86,6 +86,7 @@ DATABASES = dict(
         NAME=env('DJANGO_DATABASE_NAME', 'askoldova'),
         USER=env('DJANGO_DATABASE_USER', 'askoldova'),
         PASSWORD=env('DJANGO_DATABASE_PASSWORD', None),
+        PORT=env('DJANGO_DATABASE_PORT', None),
     )
 )
 

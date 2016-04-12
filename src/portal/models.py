@@ -25,12 +25,6 @@ class Lang(models.Model):
     caption = models.CharField(max_length=50)
     default = models.BooleanField(default=False)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        super(Lang, self).save(force_insert, force_update, using, update_fields)
-
-        generation.apply_generation_task(gen_events.DefaultPageGenerate(self.lower_code))
-        generation.apply_generation_task(gen_events.IndexPageGenerate(), )
-
     objects = LangManager()
 
     def __unicode__(self):
