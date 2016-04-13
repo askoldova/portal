@@ -50,7 +50,7 @@ def generate_pubs_page_view(lang, pager, url, title, portal_service, get_page_ur
             page=pager.page,
             navigate_url=get_page_url(lang.lower_code, 999999),
             pages_range=pages_range(pager.pages, pager.page_nr, get_page_url,
-                                    language_code=lang.lower_code),
+                                    lang_code=lang.lower_code),
             title=title
         ))
     )
@@ -338,7 +338,8 @@ def generate_menu_item_page(lang, menu_item_id):
         raise Http404("Publications is not found in menu".format(menu_item_id))
 
     return generate_pubs_page_view(lang, pager, menu_item.url, menu_item.title,
-                                   portal_service, url_of_menu_item_page_func(menu_item_id))
+                                   portal_service,
+                                   url_of_menu_item_page_func(menu_item_id))
 
 
 def menu_item_view(request, lang_code, menu_item_id):
@@ -348,10 +349,13 @@ def menu_item_view(request, lang_code, menu_item_id):
 menu_item_view_admin = login_required(menu_item_view)
 
 
-def url_of_menu_item_page_func(lang_code, menu_item_id, page):
+def url_of_menu_item_page_func(menu_item_id):
     core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
 
-    lambda lang_code, page: url_of_menu_item_page(lang_code, menu_item_id, page)
+    def fun(lang_code, page):
+        return url_of_menu_item_page(lang_code, menu_item_id, page)
+
+    return fun
 
 
 def url_of_menu_item_page(lang_code, menu_item_id, page):
@@ -359,7 +363,7 @@ def url_of_menu_item_page(lang_code, menu_item_id, page):
     core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
     core.check_exist_and_type(page, "page", long, int)
 
-    return urlresolvers.reverse(menu_item_view_page, kwargs=dict(lang=lang_code, menu_item_id=menu_item_id, page=page))
+    return urlresolvers.reverse(menu_item_view_page, kwargs=dict(lang_code=lang_code, menu_item_id=menu_item_id, page=page))
 
 
 def menu_item_view_page(request, lang_code, menu_item_id, page):
