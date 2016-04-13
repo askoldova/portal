@@ -1,5 +1,6 @@
 import collections
 
+import core
 from portal import objects as portal
 from . import STATUS_DRAFT, Pager, MIN_DATE
 
@@ -74,3 +75,13 @@ class PublicationView(collections.namedtuple("PublicationView",
 
 PUB_NOT_FOUND = PublicationView(pub_date=MIN_DATE, show_date=False, url='',
                                 title='', text='No text', categories=(), images=())
+
+
+class SubcategoryRef(collections.namedtuple("SubcategoryRef", "code title lang url")):
+    def __new__(cls, code, title, lang, url):
+        core.check_exist_and_type(code, "code", int, long)
+        core.check_exist_and_type(title, "title", str, unicode)
+        core.check_exist_and_type(lang, "lang", portal.Language)
+        core.check_exist_and_type(url, "url", str, unicode)
+        return super(SubcategoryRef, cls).__new__(cls, code=code, title=title, lang=lang, url=url)
+

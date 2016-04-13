@@ -6,6 +6,7 @@ import filebrowser.urls
 import tinymce.urls
 from portal import views as portal
 from publications import views as pubs
+from publications import menu_item_view as pub_menu
 
 PREVIEW = 'admin/preview/'
 
@@ -36,6 +37,10 @@ urlpatterns = [
         pubs.all_old_publications_page_view_admin, name='pubs_all_old_publications_page_preview'),
     url(all_publications_page_url.format(PREVIEW),
         pubs.all_old_publications_page_view_admin, name='pubs_all_publications_page_preview'),
+    url(pub_menu.menu_item_url.format(PREVIEW),
+        pub_menu.menu_item_view_admin),
+    url(pub_menu.menu_item_page_url.format(PREVIEW),
+        pub_menu.menu_item_view_page_admin),
     url(publication_url.format(PREVIEW), pubs.publication_view_admin, name='pubs_publication_preview'),
 ]
 
@@ -46,6 +51,7 @@ if (settings.DEBUG or settings.ENABLE_MEDIA) and not settings.FORCE_DISABLE_MEDI
             {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
     ]
 
+
 urlpatterns += [
     url(index_url.format(''), portal.index_view),
     url(all_publications_url.format(''), pubs.all_publications_view, name='pubs_all_publications'),
@@ -55,6 +61,7 @@ urlpatterns += [
         name='pubs_all_old_publications'),
     url(all_old_publications_page_url.format(''), pubs.all_old_publications_page_view,
         name='pubs_all_old_publications_page'),
+    url(pub_menu.menu_item_url.format(''), pub_menu.menu_item_view),
+    url(pub_menu.menu_item_page_url.format(''), pub_menu.menu_item_view_page),
     url(publication_url.format(''), pubs.publication_view),
 ]
-

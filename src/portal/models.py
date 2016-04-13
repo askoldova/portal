@@ -1,6 +1,7 @@
 from django.db import models
 
 # Create your models here.
+import core
 import generation
 from . import gen_events
 
@@ -119,6 +120,11 @@ class MenuItemManager(models.Manager):
     def get_queryset(self):
         return super(MenuItemManager, self).get_queryset().prefetch_related("menu")
 
+    def by_code(self, code):
+        core.check_exist_and_type(code, "code", int, long)
+
+        return self.get(id=code)
+
 
 class MenuItem(models.Model):
     menu = models.ForeignKey(to=MainMenu)
@@ -134,13 +140,20 @@ class MenuItem(models.Model):
     def __unicode__(self):
         return u'%s-%s' % (self.menu.caption, self.caption)
 
+
 # def MenuItem
 
 
 class MenuItemI18nManager(models.Manager):
     def get_queryset(self):
-        return super(MenuItemI18nManager, self).get_queryset().\
+        return super(MenuItemI18nManager, self).get_queryset(). \
             prefetch_related("menu_item", "menu_item__menu", "locale")
+
+    def by_code_and_lang(self, subcategory_code, lang_code):
+        core.check_exist_and_type(subcategory_code, "subcategory_code", int, long)
+        core.check_exist_and_type(lang_code, "lang_code", unicode, str)
+
+        return self.get(menu_item__id=subcategory_code, locale__code=lang_code)
 
 
 class MenuItemI18n(models.Model):

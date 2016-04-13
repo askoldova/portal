@@ -12,7 +12,7 @@
         {{ p.short_text | safe }}
         <p>{% for sc in p.categories %}
             {% if not forloop.first %}, {% endif %}
-            <a href="{{ s.url }}" class="category">{{ s.title }}</a>
+            <a href="{{ sc.url }}" class="category">{{ sc.title }}</a>
         {% endfor %}</p>
         <p class="readon_split"><a href="{{ p.url }}">
             {% if p.custom_link_name %}

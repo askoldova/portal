@@ -11,7 +11,7 @@ import publications
 from portal import objects as portal_objs
 from portal.views import path_of, portal_service, generate_concrete_redirect
 from publications.publication import dict_of_publication_url_parts
-from . import STATUS_PUBLISHED, objects, services, STATUS_HIDDEN
+from . import STATUS_PUBLISHED, objects, services, STATUS_HIDDEN, menu_item_view
 
 __author__ = 'andriy'
 
@@ -43,6 +43,9 @@ class Resolver(services.UrlsResolver):
         return url_of_old_publication(lang_code=lang_code, old_id=old_id)
 
         # def get_old_publication_url
+
+    def get_subcategory_url(self, language_code, subcategory_id):
+        return menu_item_view.url_of_menu_item(lang_code=language_code, menu_item_id=subcategory_id)
 
 
 # class Resolver

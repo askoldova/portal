@@ -4,10 +4,9 @@ import core
 import publications
 import publications.views
 
-__author__ = 'andriyg'
-
 from . import models, objects, STATUS_PUBLISHED, STATUS_HIDDEN
-from portal import objects as portal_objs
+from portal import objects as portal_objs, models as portal_models
+
 
 class UrlsResolver:
     def __init__(self):
@@ -21,11 +20,12 @@ class UrlsResolver:
 
     def get_subcategory_url(self, language_code, subcategory_id):
         raise NotImplemented()
+
+
 # class UrlsResolver
 
 
 class PublicationService(object):
-
     def __init__(self, urls_resolver, portal_service):
         """
         :type urls_resolver: publications.services.UrlsResolver
@@ -113,7 +113,7 @@ class PublicationService(object):
         core.check_exist_and_type(lang, "lang", portal_objs.Language)
 
         if pub.rss_url and pub.rss_stream:
-            url=pub.rss_url
+            url = pub.rss_url
             custom_link_name = pub.rss_stream.link_caption
         else:
             url = self._url_of_publication(pub)
@@ -137,6 +137,7 @@ class PublicationService(object):
                                                       publication_id=pub.id,
                                                       publication_date=pub.publication_date,
                                                       slug=pub.slug)
+
     # def _url_of_publication
 
     # noinspection PyMethodMayBeStatic
@@ -149,6 +150,7 @@ class PublicationService(object):
             raise ValueError("Publication[{}] is not set or not a portal.models.Publication".format(pub))
 
         return pub.state in (STATUS_PUBLISHED, STATUS_HIDDEN) and not (pub.rss_url and pub.rss_stream)
+
     # def _is_published
 
     def get_all_pubs_new_page_by_old(self, lang, old_page):
@@ -187,6 +189,7 @@ class PublicationService(object):
             return objects.PUB_REF_NOT_FOUND
 
         return self._load_pub_ref(publication)
+
     # def get_publication_ref_by_old_id
 
     def get_publication_view_by_url(self, lang, year, month, day, slug):
@@ -211,7 +214,7 @@ class PublicationService(object):
             return objects.PUB_NOT_FOUND
 
         try:
-            pub = models.Publication.objects\
+            pub = models.Publication.objects \
                 .get_by_lang_date_slug(lang_code=lang.code, publication_date=date,
                                        publication_id=publication_id, slug=slug)
         except models.Publication.DoesNotExist:
@@ -234,6 +237,7 @@ class PublicationService(object):
             return objects.PUB_NOT_FOUND
 
         return self._load_publication(pub=pub, lang=self.portal_service.get_language(pub.locale.code))
+
     # def get_publication_view_by_id
 
     def _load_publication(self, lang, pub):
@@ -266,7 +270,7 @@ class PublicationService(object):
         """
         subcategories = [pub.subcategory]
         subcategories += models.PublicationSubcategory.objects.find_by_publication(pub) or []
-        return [self.subcategory_ref(f, lang) for f in subcategories]
+        return [self._subcategory_ref(f, lang) for f in subcategories]
 
     # def _publication_categories_refs
 
@@ -275,9 +279,11 @@ class PublicationService(object):
 
     # def _publication_images
 
-    def subcategory_ref(self, subcategory, lang):
-        sub = self.portal_service.subcategory_ref(subcategory.id, lang.code)
-        url = self.urls_resolver.get_subcategory_url(lang.code, subcategory.id)
-        objects.SubcategoryRef(lang.lower_code, subcategory.code, sub.caption)
+    def _subcategory_ref(self, menu_item, lang):
+        core.check_exist_and_type(menu_item, menu_item, portal_models.MenuItem)
+
+        sub = self.portal_service.menu_item(menu_item.id, lang.code)
+        url = self.urls_resolver.get_subcategory_url(lang.lower_code, menu_item.id)
+        return objects.SubcategoryRef(lang=lang, code=menu_item.id, title=sub.title, url=url)
 
 # class PublicationService

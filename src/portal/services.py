@@ -188,7 +188,7 @@ class PortalService(object):
 
     # def get_languages
 
-    def subcategory_ref(self, subcategory_code, lang_code):
+    def menu_item(self, subcategory_code, lang_code):
         core.check_exist_and_type(subcategory_code, "subcategory_code", long, int)
         core.check_exist_and_type(lang_code, "lang_code", str, unicode)
 
@@ -196,10 +196,10 @@ class PortalService(object):
         try:
             m = models.MenuItemI18n.objects.by_code_and_lang(subcategory_code, lang_code)
             return objects.MenuItemRef(m.menu_item.code, m.text, lang)
-        except models.MainMenuI18n.DoesNotExist:
+        except models.MenuItemI18n.DoesNotExist:
             try:
                 m = models.MenuItem.objects.by_code(subcategory_code)
-                return objects.MenuItemRef(m.code, m.caption, lang)
+                return objects.MenuItemRef(m.id, m.caption, lang)
             except models.MenuItem.DoesNotExist:
                 return objects.MENU_ITEM_NOT_EXIST()
 

@@ -39,13 +39,14 @@ INSERT INTO `publications_publication`
 SELECT
 	pbi_state, pbi_date, pbi_show_date, null, p.pub_type,
     pbi_title, pbi_text_short, pbi_text, pi.pbi_rss_id, pi.pbi_rss_url,
-    pbi_id,
+    pub_id,
     (SELECT id FROM auth_user WHERE username = pbi_author),
 	(SELECT id FROM portal_lang WHERE code = UPPER(pbi_lang_id)),
 	(SELECT psc_sct_id FROM load_askoldova.pub_subcats WHERE psc_order = 0 AND psc_pub_id = pub_id)
 FROM load_askoldova.publications p
 INNER JOIN load_askoldova.pub_items pi ON pbi_pub_id = pub_id
-WHERE NOT EXISTS (SELECT id FROM publications_publication WHERE id = pub_id);
+WHERE NOT EXISTS (SELECT id FROM publications_publication WHERE id = pub_id)
+ORDER BY pbi_date DESC;
 
 INSERT INTO `publications_publicationsubcategory`
 (id,
