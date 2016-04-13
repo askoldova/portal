@@ -270,7 +270,7 @@ class PublicationService(object):
         """
         subcategories = [pub.subcategory]
         subcategories += models.PublicationSubcategory.objects.find_by_publication(pub) or []
-        return [self._subcategory_ref(f, lang) for f in subcategories]
+        return [self.get_menu_item(f, lang) for f in subcategories]
 
     # def _publication_categories_refs
 
@@ -279,11 +279,28 @@ class PublicationService(object):
 
     # def _publication_images
 
-    def _subcategory_ref(self, menu_item, lang):
-        core.check_exist_and_type(menu_item, menu_item, portal_models.MenuItem)
+    def get_menu_item(self, lang, menu_item_id):
+        core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
+        core.check_exist_and_type(lang, "lang", portal_objs.Language)
 
-        sub = self.portal_service.menu_item(menu_item.id, lang.code)
-        url = self.urls_resolver.get_subcategory_url(lang.lower_code, menu_item.id)
-        return objects.SubcategoryRef(lang=lang, code=menu_item.id, title=sub.title, url=url)
+        menu = self.portal_service.menu_item(menu_item_id, lang.code)
+        if menu == portal_objs.MENU_ITEM_NOT_EXIST:
+            return objects.PAGE_NOT_FOUND
+
+        url = self.urls_resolver.get_subcategory_url(lang.lower_code, menu_item_id)
+        return objects.SubcategoryRef(lang=lang, code=menu.code, title=menu.title, url=url)
+
+    def get_last_menu_pubs(self, lang, menu_item, page_size):
+        """
+        :type lang: portal.objects.Language
+        :type menu_item: publications.objects.SubcategoryRef
+        :rtype: publications.models.Pager
+        """
+        core.check_exist_and_type(lang, "lang", portal_objs.Language)
+        core.check_exist_and_type(menu_item, "menu_item", objects.SubcategoryRef)
+
+        pager = models.Publication.objects.pager_and_last_menu_pubs(
+            page_size=page_size, lang_code=lang.code, menu_item_id=menu_item.code)
+        return pager.replace_page(tuple(self._publication_preview(p, lang) for p in pager.page))
 
 # class PublicationService

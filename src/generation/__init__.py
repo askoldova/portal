@@ -16,7 +16,9 @@ class GenerationResult(collections.namedtuple("GenerationResult", "url content")
         """
         return super(GenerationResult, cls).__new__(cls, url, content)
 
-    # def __new__
+        # def __new__
+
+
 # def GenerationResult
 
 def save_generation(generation):
@@ -52,6 +54,7 @@ def save_generation(generation):
         f.close()
 
     return True
+
 
 # def save_generation
 

@@ -8,24 +8,11 @@ from django.template.loader import render_to_string
 import core
 import generation as gen
 import publications
-from portal import objects as portal_objs
 from portal.views import path_of, portal_service, generate_concrete_redirect
-from publications.publication import dict_of_publication_url_parts
-from . import STATUS_PUBLISHED, objects, services, STATUS_HIDDEN, menu_item_view
+from portal import objects as portal_objs
+from . import STATUS_PUBLISHED, objects, services, STATUS_HIDDEN
+from .publication import dict_of_publication_url_parts
 
-__author__ = 'andriy'
-
-
-def lang_of(code):
-    lang = portal_service.get_language(code)
-    if lang == portal_objs.Language.LANGUAGE_NOT_FOUND:
-        raise Http404("Language %s is not found" % (code,))
-    if lang.code.lower() != code:
-        raise Http404("Language %s is not found" % (code,))
-    return lang
-
-
-# def lang_of
 
 class Resolver(services.UrlsResolver):
     def __init__(self):
@@ -45,14 +32,78 @@ class Resolver(services.UrlsResolver):
         # def get_old_publication_url
 
     def get_subcategory_url(self, language_code, subcategory_id):
-        return menu_item_view.url_of_menu_item(lang_code=language_code, menu_item_id=subcategory_id)
+        return url_of_menu_item(lang_code=language_code, menu_item_id=subcategory_id)
 
 
 # class Resolver
 
 resolver = Resolver()
-publications_service = services.PublicationService(resolver, portal_service=portal_service)
 
+def generate_pubs_page_view(lang, pager, url, title, portal_service, get_page_url):
+    return gen.GenerationResult(
+        url=url,
+        content=render_to_string("publications.html", context=dict(
+            langs=portal_service.get_languages(lang),
+            lang=lang,
+            page_nr=pager.page_nr,
+            pages=pager.pages,
+            page=pager.page,
+            navigate_url=get_page_url(lang.lower_code, 999999),
+            pages_range=pages_range(pager.pages, pager.page_nr, get_page_url,
+                                    language_code=lang.lower_code),
+            title=title
+        ))
+    )
+
+
+def pages_range(pages, page, urlresolver_func, **kwargs):
+    """
+    Should return list of pages from pages to one, not more than 13-15 elements.
+    Have return first page, null value, page-5 up tp page+5 range, null value, last page
+    :type pages int
+    :type page int
+    :rtype list
+    """
+    if pages <= 0:
+        return ()
+    elif pages == 1:
+        kwargs['page'] = 1
+        return (1, urlresolver_func(**kwargs)),
+    if page < 1:
+        page = 1
+    if page > pages:
+        page = pages
+
+    def _page_and_ref(_page):
+        kwargs['page'] = _page
+        return _page, None if _page == page else urlresolver_func(**kwargs)
+
+    _NONE_REF = ("...", None)
+
+    plist = _page_and_ref(1),
+    if page - 5 > 2:
+        plist += _NONE_REF,
+    range_from = max(2, page - 5)
+    range_to = min(page + 5, pages - 1)
+    for i in range(range_from, range_to + 1):
+        plist += _page_and_ref(i),
+    if page + 5 < pages - 1:
+        plist += (_NONE_REF,)
+    plist += _page_and_ref(pages),
+
+    return tuple(reversed(plist))
+
+
+def lang_of(code):
+    lang = portal_service.get_language(code)
+    if lang == portal_objs.Language.LANGUAGE_NOT_FOUND:
+        raise Http404("Language %s is not found" % (code,))
+    if lang.code.lower() != code:
+        raise Http404("Language %s is not found" % (code,))
+    return lang
+
+
+publications_service = services.PublicationService(resolver, portal_service=portal_service)
 
 # === begin of all publications views ===
 
@@ -95,22 +146,6 @@ def url_of_all_publications_page(language_code, page):
 
 # --- generate all_publications
 
-def _generate_pubs_page_view(lang, pager, url, title):
-    return gen.GenerationResult(
-        url=url,
-        content=render_to_string("publications.html", context=dict(
-            langs=portal_service.get_languages(lang),
-            lang=lang,
-            page_nr=pager.page_nr,
-            pages=pager.pages,
-            page=pager.page,
-            navigate_url=url_of_all_publications_page(lang.lower_code, 999999),
-            pages_range=pages_range(pager.pages, pager.page_nr, url_of_all_publications_page,
-                                    language_code=lang.lower_code),
-            title=title
-        ))
-    )
-
 
 def generate_all_publications(url, lang):
     lang = lang_of(lang)
@@ -118,7 +153,8 @@ def generate_all_publications(url, lang):
     if pager == objects.PAGE_NOT_FOUND:
         raise Http404("Default page is not found")
 
-    return _generate_pubs_page_view(lang, pager, url, u"Події, новини, заходи")
+    return generate_pubs_page_view(lang, pager, url, u"Події, новини, заходи",
+                                   portal_service, url_of_all_publications_page)
 
 
 def generate_all_publications_page(url, lang, page):
@@ -129,7 +165,8 @@ def generate_all_publications_page(url, lang, page):
     if pager == objects.PAGE_NOT_FOUND:
         raise Http404("Page [{}] is not found".format(page))
 
-    return _generate_pubs_page_view(lang, pager, url, u"Події, новини, заходи")
+    return generate_pubs_page_view(lang, pager, url, u"Події, новини, заходи",
+                                   portal_service, url_of_all_publications_page)
 
 
 def generate_all_old_publications(url, lang):
@@ -268,39 +305,65 @@ def parse_number_or_http_404(value, error=None):
         raise Http404(error)
 
 
-def pages_range(pages, page, urlresolver_func, **kwargs):
-    """
-    Should return list of pages from pages to one, not more than 13-15 elements.
-    Have return first page, null value, page-5 up tp page+5 range, null value, last page
-    :type pages int
-    :type page int
-    :rtype list
-    """
-    if pages <= 0:
-        return ()
-    elif pages == 1:
-        kwargs['page'] = 1
-        return (1, urlresolver_func(**kwargs)),
-    if page < 1:
-        page = 1
-    if page > pages:
-        page = pages
+menu_item_url = r'^{}(?P<lang_code>\w\w)/(?P<menu_item_id>\d+)/?$'
+menu_item_page_url = r'^{}(?P<lang_code>\w\w)/(?P<menu_item_id>\d+)/(?P<page>\d+).html$'
 
-    def _page_and_ref(_page):
-        kwargs['page'] = _page
-        return _page, None if _page == page else urlresolver_func(**kwargs)
 
-    _NONE_REF = ("...", None)
+def url_of_menu_item(lang_code, menu_item_id):
+    core.check_exist_and_type(lang_code, "lang_code", str, unicode)
+    core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
 
-    plist = _page_and_ref(1),
-    if page - 5 > 2:
-        plist += _NONE_REF,
-    range_from = max(2, page - 5)
-    range_to = min(page + 5, pages - 1)
-    for i in range(range_from, range_to + 1):
-        plist += _page_and_ref(i),
-    if page + 5 < pages - 1:
-        plist += (_NONE_REF,)
-    plist += _page_and_ref(pages),
+    return urlresolvers.reverse(menu_item_view, kwargs=dict(lang_code=lang_code, menu_item_id=menu_item_id))
 
-    return tuple(reversed(plist))
+
+def url_of_menu_item_admin(lang_code, menu_item_id):
+    core.check_exist_and_type(lang_code, "lang_code", str, unicode)
+    core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
+
+    return urlresolvers.reverse(menu_item_view_admin, kwargs=dict(lang=lang_code, menu_item_id=menu_item_id))
+
+
+def generate_menu_item_page(lang, menu_item_id):
+    lang = lang_of(lang)
+    try:
+        menu_item_id = int(menu_item_id)
+    except ValueError:
+        raise Http404("Invalid menu id code {}".format(menu_item_id))
+    menu_item = publications_service.get_menu_item(lang, menu_item_id)
+    if menu_item == objects.PAGE_NOT_FOUND:
+        raise Http404("Menu {} is not found".format(menu_item_id))
+
+    pager = publications_service.get_last_menu_pubs(lang, menu_item, 6)
+    if menu_item == objects.PAGE_NOT_FOUND:
+        raise Http404("Publications is not found in menu".format(menu_item_id))
+
+    return generate_pubs_page_view(lang, pager, menu_item.url, menu_item.title,
+                                   portal_service, url_of_menu_item_page_func(menu_item_id))
+
+
+def menu_item_view(request, lang_code, menu_item_id):
+    return HttpResponse(generate_menu_item_page(lang_code, menu_item_id).content)
+
+
+menu_item_view_admin = login_required(menu_item_view)
+
+
+def url_of_menu_item_page_func(lang_code, menu_item_id, page):
+    core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
+
+    lambda lang_code, page: url_of_menu_item_page(lang_code, menu_item_id, page)
+
+
+def url_of_menu_item_page(lang_code, menu_item_id, page):
+    core.check_exist_and_type(lang_code, "lang_code", str, unicode)
+    core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
+    core.check_exist_and_type(page, "page", long, int)
+
+    return urlresolvers.reverse(menu_item_view_page, kwargs=dict(lang=lang_code, menu_item_id=menu_item_id, page=page))
+
+
+def menu_item_view_page(request, lang_code, menu_item_id, page):
+    pass
+
+
+menu_item_view_page_admin = login_required(menu_item_view_page)

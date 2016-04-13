@@ -1,6 +1,7 @@
 from django.conf import settings
 
 import generation as gen
+import publications
 from . import gen_events, views
 
 publications_service = views.publications_service
@@ -28,7 +29,7 @@ def _generate_publication(command):
     """
     result = views.generate_publication_by_id(publication_id=command.publication_id)
     gen.save_generation(result)
-    ref = views.publications_service.get_publication_ref_by_id(command.publication_id)
+    ref = publications.publications_view.publications_service.get_publication_ref_by_id(command.publication_id)
     if ref.old_id:
         apply_internal(gen_events.OldPublicationGenerate(old_id=ref.old_id, lang_code=ref.language.lower_code))
 

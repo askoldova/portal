@@ -64,6 +64,9 @@ class PublicationManager(models.Manager):
 
     # def `_count_pages
 
+    def pager_and_last_menu_pubs(self, page_size, lang_code, menu_item_id):
+
+    page_size=page_size, lang_code=lang.code, menu_item_id=menu_item.code)
     def pager_and_last_pubs(self, page_size, lang_code):
         page_size, q = self._fix_page_size_and_get_pub_query(lang_code, page_size)
 

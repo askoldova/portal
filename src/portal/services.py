@@ -201,7 +201,7 @@ class PortalService(object):
                 m = models.MenuItem.objects.by_code(subcategory_code)
                 return objects.MenuItemRef(m.id, m.caption, lang)
             except models.MenuItem.DoesNotExist:
-                return objects.MENU_ITEM_NOT_EXIST()
+                return objects.MENU_ITEM_NOT_EXIST
 
 
 

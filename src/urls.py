@@ -6,7 +6,6 @@ import filebrowser.urls
 import tinymce.urls
 from portal import views as portal
 from publications import views as pubs
-from publications import menu_item_view as pub_menu
 
 PREVIEW = 'admin/preview/'
 
@@ -37,10 +36,10 @@ urlpatterns = [
         pubs.all_old_publications_page_view_admin, name='pubs_all_old_publications_page_preview'),
     url(all_publications_page_url.format(PREVIEW),
         pubs.all_old_publications_page_view_admin, name='pubs_all_publications_page_preview'),
-    url(pub_menu.menu_item_url.format(PREVIEW),
-        pub_menu.menu_item_view_admin),
-    url(pub_menu.menu_item_page_url.format(PREVIEW),
-        pub_menu.menu_item_view_page_admin),
+    url(pubs.menu_item_url.format(PREVIEW),
+        pubs.menu_item_view_admin),
+    url(pubs.menu_item_page_url.format(PREVIEW),
+        pubs.menu_item_view_page_admin),
     url(publication_url.format(PREVIEW), pubs.publication_view_admin, name='pubs_publication_preview'),
 ]
 
@@ -61,7 +60,7 @@ urlpatterns += [
         name='pubs_all_old_publications'),
     url(all_old_publications_page_url.format(''), pubs.all_old_publications_page_view,
         name='pubs_all_old_publications_page'),
-    url(pub_menu.menu_item_url.format(''), pub_menu.menu_item_view),
-    url(pub_menu.menu_item_page_url.format(''), pub_menu.menu_item_view_page),
+    url(pubs.menu_item_url.format(''), pubs.menu_item_view),
+    url(pubs.menu_item_page_url.format(''), pubs.menu_item_view_page),
     url(publication_url.format(''), pubs.publication_view),
 ]
