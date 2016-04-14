@@ -268,9 +268,9 @@ class PublicationService(object):
         :type lang: portal.objects.Language
         :type pub: publications.models.Publication
         """
-        subcategories = [pub.subcategory]
-        subcategories += models.PublicationSubcategory.objects.find_by_publication(pub) or []
-        return [self.get_menu_item(lang, f.id) for f in subcategories]
+        subcategories = pub.subcategory,
+        subcategories += tuple(f.subcategory for f in pub.publicationsubcategory_set.all())
+        return tuple(self.get_menu_item(lang, f.id) for f in subcategories)
 
     # def _publication_categories_refs
 

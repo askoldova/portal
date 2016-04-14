@@ -136,12 +136,12 @@ all_publications_page_view_admin = login_required(all_publications_page_view)
 
 
 # --- urls all_publications
-def url_of_all_publications(language_code):
-    return urlresolvers.reverse(all_publications_view, kwargs=dict(lang=language_code))
+def url_of_all_publications(lang_code):
+    return urlresolvers.reverse(all_publications_view, kwargs=dict(lang=lang_code))
 
 
-def url_of_all_publications_page(language_code, page):
-    return urlresolvers.reverse(all_publications_page_view, kwargs=dict(lang=language_code, page=page))
+def url_of_all_publications_page(lang_code, page):
+    return urlresolvers.reverse(all_publications_page_view, kwargs=dict(lang=lang_code, page=page))
 
 
 # --- generate all_publications

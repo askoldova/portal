@@ -195,7 +195,7 @@ class PortalService(object):
         lang = self.get_language(lang_code)
         try:
             m = models.MenuItemI18n.objects.by_code_and_lang(subcategory_code, lang_code)
-            return objects.MenuItemRef(m.menu_item.code, m.text, lang)
+            return objects.MenuItemRef(m.menu_item.id, m.caption, lang)
         except models.MenuItemI18n.DoesNotExist:
             try:
                 m = models.MenuItem.objects.by_code(subcategory_code)

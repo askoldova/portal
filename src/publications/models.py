@@ -186,7 +186,7 @@ class Publication(models.Model):
 
 class PublicationSubcategoryManager(models.Manager):
     def find_by_publication(self, pub):
-        [f.subcategory for f in self.filter(publication__exact=pub)]
+        return [f.subcategory for f in self.filter(publication__exact=pub)]
 
 
 class PublicationSubcategory(models.Model):
