@@ -8,8 +8,8 @@ from django.template.loader import render_to_string
 import core
 import generation as gen
 import publications
-from portal.views import path_of, portal_service, generate_concrete_redirect
 from portal import objects as portal_objs
+from portal.views import path_of, portal_service, generate_concrete_redirect
 from . import STATUS_PUBLISHED, objects, services, STATUS_HIDDEN
 from .publication import dict_of_publication_url_parts
 
@@ -38,6 +38,7 @@ class Resolver(services.UrlsResolver):
 # class Resolver
 
 resolver = Resolver()
+
 
 def generate_pubs_page_view(lang, pager, url, title, portal_service, get_page_url):
     return gen.GenerationResult(
@@ -104,6 +105,7 @@ def lang_of(code):
 
 
 publications_service = services.PublicationService(resolver, portal_service=portal_service)
+
 
 # === begin of all publications views ===
 
@@ -323,7 +325,7 @@ def url_of_menu_item_admin(lang_code, menu_item_id):
     return urlresolvers.reverse(menu_item_view_admin, kwargs=dict(lang=lang_code, menu_item_id=menu_item_id))
 
 
-def generate_menu_item_page(lang, menu_item_id):
+def generate_menu_item_last(lang, menu_item_id):
     lang = lang_of(lang)
     try:
         menu_item_id = int(menu_item_id)
@@ -333,7 +335,7 @@ def generate_menu_item_page(lang, menu_item_id):
     if menu_item == objects.PAGE_NOT_FOUND:
         raise Http404("Menu {} is not found".format(menu_item_id))
 
-    pager = publications_service.get_last_menu_pubs(lang, menu_item, 6)
+    pager = publications_service.get_menu_item_last_pubs(lang, menu_item, 6)
     if menu_item == objects.PAGE_NOT_FOUND:
         raise Http404("Publications is not found in menu".format(menu_item_id))
 
@@ -343,7 +345,7 @@ def generate_menu_item_page(lang, menu_item_id):
 
 
 def menu_item_view(request, lang_code, menu_item_id):
-    return HttpResponse(generate_menu_item_page(lang_code, menu_item_id).content)
+    return HttpResponse(generate_menu_item_last(lang_code, menu_item_id).content)
 
 
 menu_item_view_admin = login_required(menu_item_view)
@@ -363,11 +365,37 @@ def url_of_menu_item_page(lang_code, menu_item_id, page):
     core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
     core.check_exist_and_type(page, "page", long, int)
 
-    return urlresolvers.reverse(menu_item_view_page, kwargs=dict(lang_code=lang_code, menu_item_id=menu_item_id, page=page))
+    return urlresolvers.reverse(menu_item_view_page,
+                                kwargs=dict(lang_code=lang_code, menu_item_id=menu_item_id, page=page))
+
+
+def generate_menu_item_page(lang_code, menu_item_id, page):
+    lang = lang_of(lang_code)
+    try:
+        menu_item_id = int(menu_item_id)
+    except ValueError:
+        raise Http404("Invalid menu id code {}".format(menu_item_id))
+    menu_item = publications_service.get_menu_item(lang, menu_item_id)
+    if menu_item == objects.PAGE_NOT_FOUND:
+        raise Http404("Menu {} is not found".format(menu_item_id))
+
+    try:
+        page = int(page)
+    except ValueError:
+        raise Http404("Invalid page number {}".format(page))
+
+    pager = publications_service.get_menu_item_pubs_page(lang, menu_item, page=page, page_size=6)
+    if pager == objects.PAGE_NOT_FOUND:
+        raise Http404("Page [{}] is not found".format(page))
+
+    url = url_of_menu_item_page(lang_code, menu_item_id, page)
+    return generate_pubs_page_view(
+        lang, pager, url, menu_item.title, portal_service,
+        url_of_menu_item_page_func(menu_item_id))
 
 
 def menu_item_view_page(request, lang_code, menu_item_id, page):
-    pass
+    return HttpResponse(generate_menu_item_page(lang_code, menu_item_id, page).content)
 
 
 menu_item_view_page_admin = login_required(menu_item_view_page)
