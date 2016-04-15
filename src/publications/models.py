@@ -73,18 +73,21 @@ class PublicationManager(models.Manager):
 
         return Pager(page_nr=pages, pages=pages, page=tuple(q[:page_size]))
 
-    def pager_and_last_pubs(self, page_size, lang_code):
+    def pager_and_menu_pubs_page(self, page, page_size, lang_code, menu_item_id):
         page_size, q = self._fix_page_size_and_get_pub_query(lang_code, page_size)
+        q = q.filter(subcategory__id=menu_item_id) | \
+            q.filter(publicationsubcategory__subcategory__id=menu_item_id)
 
-        pages, remind = self._count_pages(page_size, q)
-
-        return Pager(page_nr=pages, pages=pages, page=tuple(q[:page_size]))
+        return self._get_page_from_query(page, page_size, q)
 
     # def pager_and_last_pubs
 
     def pager_and_all_pubs_page(self, page, page_size, lang_code):
         page_size, q = self._fix_page_size_and_get_pub_query(lang_code, page_size)
 
+        return self._get_page_from_query(page, page_size, q)
+
+    def _get_page_from_query(self, page, page_size, q):
         pages, remind = self._count_pages(page_size, q)
         if page > pages:
             page_data = ()
@@ -103,7 +106,6 @@ class PublicationManager(models.Manager):
             _to = remind + (pages - page) * page_size
 
             page_data = tuple(q[_from:_to])
-
         return Pager(page_nr=page, pages=pages, page=page_data)
 
     def _fix_page_size_and_get_pub_query(self, lang_code, page_size):

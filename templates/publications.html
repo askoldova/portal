@@ -36,6 +36,7 @@
     {% endfor %}
     </p>
     </div>
+    <!-- {{ pages }} pages, page: {{ page_nr }}, navigate_url: {{ navigate_url }}-->
     <div class="paginator_pages">{{ pages }} сторінок</div>
     <script type="text/javascript">
         var p = new Paginator('paginator', {{ pages }}, 15, {{ page_nr }}, '{{ navigate_url }}', '999999');

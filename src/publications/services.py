@@ -290,7 +290,7 @@ class PublicationService(object):
         url = self.urls_resolver.get_subcategory_url(lang.lower_code, menu_item_id)
         return objects.SubcategoryRef(lang=lang, code=menu.code, title=menu.title, url=url)
 
-    def get_last_menu_pubs(self, lang, menu_item, page_size):
+    def get_menu_item_last_pubs(self, lang, menu_item, page_size):
         """
         :type lang: portal.objects.Language
         :type menu_item: publications.objects.SubcategoryRef
@@ -298,9 +298,28 @@ class PublicationService(object):
         """
         core.check_exist_and_type(lang, "lang", portal_objs.Language)
         core.check_exist_and_type(menu_item, "menu_item", objects.SubcategoryRef)
+        core.check_exist_and_type(page_size, "page_size", int, long)
 
         pager = models.Publication.objects.pager_and_last_menu_pubs(
             page_size=page_size, lang_code=lang.code, menu_item_id=menu_item.code)
         return pager.replace_page(tuple(self._publication_preview(p, lang) for p in pager.page))
+
+    def get_menu_item_pubs_page(self, lang, menu_item, page, page_size):
+        """
+        :type lang: portal.objects.Language
+        :type menu_item: publications.objects.SubcategoryRef
+        :type page: int|long
+        :type page_size: int|long
+        :rtype: publications.models.Pager
+        """
+        core.check_exist_and_type(lang, "lang", portal_objs.Language)
+        core.check_exist_and_type(menu_item, "menu_item", objects.SubcategoryRef)
+        core.check_exist_and_type(page, "page", int, long)
+        core.check_exist_and_type(page_size, "page_size", int, long)
+
+        pager = models.Publication.objects.pager_and_menu_pubs_page(
+            page=page, page_size=page_size, lang_code=lang.code, menu_item_id=menu_item.code)
+        return pager.replace_page(tuple(self._publication_preview(p, lang) for p in pager.page))
+
 
 # class PublicationService
