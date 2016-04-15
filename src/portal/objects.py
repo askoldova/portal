@@ -1,3 +1,5 @@
+import core
+
 __author__ = 'andriy'
 
 from collections import namedtuple
@@ -22,3 +24,18 @@ class MenuItemRef(namedtuple("MenuItemRef", "code slug title language")):
 
 
 MENU_ITEM_NOT_EXIST = MenuItemRef(0, None, "Does not exists", LANGUAGE_NOT_FOUND)
+
+
+class MenuRef(namedtuple("MenuRef", "code title width items")):
+    def __new__(cls, code, title, width, items):
+        width = long(width) if width else None
+        core.check_int_value(code=code)
+        core.check_string_value(title=title)
+        core.check_type2(tuple, items=items)
+
+        return super(MenuRef, cls).__new__(cls, code=code, title=title, items=items, width=width or 0)
+
+    def add_subitem(self, submenu_item):
+        core.check_exist_and_type2(MenuItemRef, submenu_item=submenu_item)
+
+        return MenuRef(self.code, self.title,  self.width, self.items + (submenu_item,))

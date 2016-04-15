@@ -108,7 +108,7 @@ def check_exist_and_type2(*types, **values):
         _check_type(name, v, *types)
 
 
-def check_string_exist(**values):
+def check_string_value(**values):
     check_exist_and_type2(str, unicode, **values)
 
 

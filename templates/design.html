@@ -4,13 +4,13 @@
     <title>{% block title %}Title{% endblock %}</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     {% if rss_link %}
-        <link rel=”alternate” type=”application/rss+xml” title=”Підписка на RSS-новини” href=”${rss_link}” >
+        <link rel=”alternate” type=”application/rss+xml” title=”Підписка на RSS-новини” href=”${rss_link}”>
     {% endif %}
     <link rel="stylesheet" type="text/css" href="/css/template.css">
     <link rel="stylesheet" type="text/css" href="/css/chromestyle.css">
-    <link rel="stylesheet" type="text/css" href="/css/paginator3000.css" />
+    <link rel="stylesheet" type="text/css" href="/css/paginator3000.css"/>
     <link rel="stylesheet" href="/css/jquery.fancybox-1.2.1.css" type="text/css" media="screen">
-    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon"/>
     <script type="text/javascript" src="/js/chrome.js"></script>
     <script type="text/javascript" src="/js/paginator3000.js"></script>
     <script type="text/javascript" src="/js/jquery-1.3.2.min.js"></script>
@@ -19,21 +19,21 @@
     <script type="text/javascript">
         <!-- //Fancy box apply
         $.fn.fancybox.defaults = {
-            imageScale			:	true,
-            zoomOpacity			:	false,
-            zoomSpeedIn			:	0,
-            zoomSpeedOut		:	0,
-            zoomSpeedChange		:	300,
-            easingIn			:	'swing',
-            easingOut			:	'swing',
-            easingChange		:	'swing',
-            overlayShow			:	true,
-            overlayOpacity		:	0.3,
-            hideOnContentClick	:	true,
-            centerOnScroll		:	true,
-            itemArray			:	[]
+            imageScale: true,
+            zoomOpacity: false,
+            zoomSpeedIn: 0,
+            zoomSpeedOut: 0,
+            zoomSpeedChange: 300,
+            easingIn: 'swing',
+            easingOut: 'swing',
+            easingChange: 'swing',
+            overlayShow: true,
+            overlayOpacity: 0.3,
+            hideOnContentClick: true,
+            centerOnScroll: true,
+            itemArray: []
         };
-        $(document).ready(function() {
+        $(document).ready(function () {
             $("a#group").fancybox();
         });
         -->
@@ -56,7 +56,8 @@
                 <am:plugin name="node-head" var1="58"/>
                 <div class="column_text" style="color:#E56E0D;">
                     <p style="text-align: center">
-                        <a href="register">Реєстрація бажаючих отримувати найважливішу інформацію від нашої церкви</a></p>
+                        <a href="register">Реєстрація бажаючих отримувати найважливішу інформацію від нашої церкви</a>
+                    </p>
                 </div>
                 <h1><a href="needs-in-help">Потребую допомоги</a></h1>
                 <c:if test="${requestScope['com.gushuley.portal.CurrentLogin'].auth}">
@@ -67,7 +68,7 @@
             <!-- div class left -->
         </div>
         <!-- div class wrap -->
-        <div class="right" >
+        <div class="right">
             <a href="needs-in-pray"><img src="/images/molytva.jpg" border="0" alt="Потреба в молитві"></a>
             <am:plugin name="efficiency" var1="11"/>
             <am:plugin name="node-link" var1="1458"/>
@@ -75,14 +76,16 @@
             <h1><a>Знайдіть нас у Facebook</a></h1>
             <div class="column_text" style="color:#E56E0D;">
                 <div id="fb-root"></div>
-                <script>(function(d, s, id) {
+                <script>(function (d, s, id) {
                     var js, fjs = d.getElementsByTagName(s)[0];
                     if (d.getElementById(id)) return;
-                    js = d.createElement(s); js.id = id;
+                    js = d.createElement(s);
+                    js.id = id;
                     js.src = "//connect.facebook.net/uk_UA/all.js#xfbml=1&appId=505225196211196";
                     fjs.parentNode.insertBefore(js, fjs);
                 }(document, 'script', 'facebook-jssdk'));</script>
-                <div class="fb-like-box" data-href="http://www.facebook.com/AskoldovaMohyla" data-width="224" data-height="315" data-show-faces="true" data-stream="false" data-header="false"></div>
+                <div class="fb-like-box" data-href="http://www.facebook.com/AskoldovaMohyla" data-width="224"
+                     data-height="315" data-show-faces="true" data-stream="false" data-header="false"></div>
             </div>
             <am:plugin name="node-link" var1="1457"/>
         </div>
@@ -108,7 +111,8 @@
         <div id="header_right">
             <div class="hdr_txt">
                 <c:if test="${portalRssLink != nul}">
-                    <a href="./${portalRssLink}" title="Підписка на RSS-новини"><img src="/images/rss.png" style="vertical-align: text-top"/></a>
+                    <a href="./${portalRssLink}" title="Підписка на RSS-новини"><img src="/images/rss.png"
+                                                                                     style="vertical-align: text-top"/></a>
                 </c:if>
                 &nbsp;
                 <a href="#">Додати в закладки</a> |
@@ -128,14 +132,38 @@
     </div>
     <!-- div id header -->
     <div id="menu">
-        <am:plugin name="menu"/>
+        <div class="chromestyle" id="chromemenu">
+            <ul>
+                <li><a href="{{ langUrl }}">Головна</a></li>
+                {% for item in menuItems %}
+                    <li><a href="#" rel="dropmenu{{ forloop.counter }}">{{ item.title }}</a>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% for item in menuItems %}
+            <div id="dropmenu{{ forloop.counter }}" class="dropmenudiv" {% if item.width > 0 %}style="width: {{ item.width }}px;"{% endif %}>
+                {% for i2 in item.items %}
+                    <a href="{{ i2.url }}">
+                        {{ i2.title }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <script type="text/javascript">
+            cssdropdown.startchrome("chromemenu")
+        </script>
+
     </div>
     <!-- div id menu -->
 
 </div>
 <!-- div id gordi -->
 <!-- euromaidan -->
-<a href="http://stfalcon.github.io/euromaidan/" class="em-ribbon" style="position: absolute; left:0; top:0; width: 90px; height: 90px; background: url('http://stfalcon.github.io/euromaidan/img/em-ribbon.png'); z-index: 2013; border: 0;" title="Розмісти стрічку з символікою України і ЄС на своєму сайті!" target="_blank"></a>
+<a href="http://stfalcon.github.io/euromaidan/" class="em-ribbon"
+   style="position: absolute; left:0; top:0; width: 90px; height: 90px; background: url('http://stfalcon.github.io/euromaidan/img/em-ribbon.png'); z-index: 2013; border: 0;"
+   title="Розмісти стрічку з символікою України і ЄС на своєму сайті!" target="_blank"></a>
 <!-- euromaidan -->
 <c:if test="${not requestScope['com.gushuley.portal.CurrentLogin'].auth}">
     <!--  google analytics -->
@@ -149,10 +177,12 @@
     </script>
     <!-- YaMetrics begin -->
     <script type="text/javascript"><!--
-    var ya_cid=163976;
+    var ya_cid = 163976;
     //--></script>
     <script src="http://bs.yandex.ru/resource/watch.js" type="text/javascript"></script>
-    <noscript><div style="display: inline;"><img src="http://bs.yandex.ru/watch/163976" width="1" height="1" alt="" /></div></noscript>
+    <noscript>
+        <div style="display: inline;"><img src="http://bs.yandex.ru/watch/163976" width="1" height="1" alt=""/></div>
+    </noscript>
     <!-- YaMetrics end -->
 </c:if>
 </body>

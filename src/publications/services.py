@@ -290,8 +290,11 @@ class PublicationService(object):
         if menu == portal_objs.MENU_ITEM_NOT_EXIST:
             return objects.PAGE_NOT_FOUND
 
-        url = self.urls_resolver.get_subcategory_url(lang.lower_code, menu_item_id, slug)
-        return objects.SubcategoryRef(lang=lang, code=menu.code, title=menu.title, url=url, slug=menu.slug)
+        return self._subcategory_ref(menu)
+
+    def _subcategory_ref(self, menu):
+        url = self.urls_resolver.get_subcategory_url(menu.language.lower_code, menu.code, menu.slug)
+        return objects.SubcategoryRef(lang=menu.language, code=menu.code, title=menu.title, url=url, slug=menu.slug)
 
     def get_menu_item_last_pubs(self, lang, menu_item, page_size):
         """
@@ -324,5 +327,14 @@ class PublicationService(object):
             page=page, page_size=page_size, lang_code=lang.code, menu_item_id=menu_item.code)
         return pager.replace_page(tuple(self._publication_preview(p, lang) for p in pager.page))
 
+    def get_main_menu(self, language):
+        core.check_exist_and_type2(portal_objs.Language, language=language)
+
+        menu = ()
+        for item in self.portal_service.main_menu(language):
+            subcategories = tuple(self._subcategory_ref(s) for s in item.items)
+            menu += objects.CategoryRef(item.code, item.title, item.width, subcategories),
+
+        return menu
 
 # class PublicationService

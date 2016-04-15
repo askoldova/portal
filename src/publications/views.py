@@ -45,6 +45,7 @@ def generate_pubs_page_view(lang, pager, url, title, portal_service, get_page_ur
     return gen.GenerationResult(
         url=url,
         content=render_to_string("publications.html", context=dict(
+            menuItems=publications_service.get_main_menu(lang),
             langs=portal_service.get_languages(lang),
             lang=lang,
             page_nr=pager.page_nr,

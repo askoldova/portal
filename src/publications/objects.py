@@ -86,3 +86,11 @@ class SubcategoryRef(collections.namedtuple("SubcategoryRef", "code title lang u
         core.check_type(slug, "slug", str, unicode)
         return super(SubcategoryRef, cls).__new__(cls, code=code, title=title, lang=lang, url=url, slug=slug)
 
+
+class CategoryRef(collections.namedtuple("CategoryRef", "code title width items")):
+    def __new__(cls, code, title, width, items):
+        core.check_int_value(code=code)
+        core.check_string_value(title=title)
+        core.check_type2(tuple, items=items)
+        core.check_int(width=width)
+        return super(CategoryRef, cls).__new__(cls, code=code, title=title, width=width, items=items)

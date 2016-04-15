@@ -27,6 +27,17 @@ def _load_language_and_locale(lang, l10n_lang):
     return olang
 
 
+def _submenu_item_ref(lang, menu_item):
+    core.check_exist_and_type2(objects.Language, lang=lang)
+    core.check_exist_and_type2(models.MenuItem, menu=menu_item)
+    try:
+        i = models.MenuItemI18n.objects.by_code_and_lang(menu_item.id, lang.lower_code)
+        caption = i.caption
+    except models.MenuItemI18n.DoesNotExist:
+        caption = menu_item.caption
+    return objects.MenuItemRef(code=menu_item.id, slug=menu_item.slug, title=caption, lang=lang)
+
+
 class PortalService(object):
     def __init__(self):
         pass
@@ -202,17 +213,32 @@ class PortalService(object):
             else:
                 m = models.MenuItem.objects.by_code(subcategory_code)
 
-            try:
-                i = models.MenuItemI18n.objects.by_code_and_lang(m.id, lang_code)
-                caption = i.caption
-            except models.MenuItemI18n.DoesNotExist:
-                caption = m.caption
-
-            return objects.MenuItemRef(code=m.id, slug=m.slug, title=caption, lang=lang)
+            return _submenu_item_ref(lang, m)
         except models.MenuItem.DoesNotExist:
             return objects.MENU_ITEM_NOT_EXIST
 
 
+    def main_menu(self, language):
+        core.check_exist_and_type2(objects.Language, language=language)
 
+        menu_item = objects.MenuRef(-1, "None", 0, ())
+        menu = ()
+        for s in models.MenuItem.objects.main_menu_items():
+            if menu_item.code != s.menu.id:
+                if menu_item.code > -1:
+                    menu += (menu_item,)
+                try:
+                    i = models.MainMenuI18n.objects.by_code_and_lang(s.menu.id, language.lower_code)
+                    caption = i.caption
+                except models.MainMenuI18n.DoesNotExist:
+                    caption = s.menu.caption
 
+                menu_item = objects.MenuRef(s.menu.id, caption, s.menu.width, ())
+            submenu_item = _submenu_item_ref(language, s)
+            menu_item = menu_item.add_subitem(submenu_item)
+
+        if menu_item.code > -1:
+            menu += (menu_item,)
+
+        return menu
 # class PortalService

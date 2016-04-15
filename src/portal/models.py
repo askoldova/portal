@@ -97,6 +97,12 @@ class MainMenuI18nManager(models.Manager):
     def get_queryset(self):
         return super(MainMenuI18nManager, self).get_queryset().prefetch_related("locale")
 
+    def by_code_and_lang(self, menu_code, lang_code):
+        core.check_exist_and_type(menu_code, "menu_code", int, long)
+        core.check_exist_and_type(lang_code, "lang_code", unicode, str)
+
+        return self.get(menu__id=menu_code, locale__code=lang_code)
+
 
 class MainMenuI18n(models.Model):
     menu = models.ForeignKey(to=MainMenu)
@@ -129,6 +135,9 @@ class MenuItemManager(models.Manager):
         core.check_exist_and_type(slug, "slug", str, unicode)
 
         return self.get(slug=slug)
+
+    def main_menu_items(self):
+        return self.filter(menu__hidden=False).order_by("menu__order", "menu__id", "order", "id")
 
 
 class MenuItem(models.Model):
