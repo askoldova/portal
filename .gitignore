@@ -2,7 +2,7 @@
 *.pyc
 .env*
 tests
-static
+/static
 .coverages
 .coverage
 dump.rdb
