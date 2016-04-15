@@ -20,7 +20,7 @@ def _load_language_and_locale(lang, l10n_lang):
     try:
         l10n_lang = models.Lang.objects.get_by_code(l10n_lang)
         locale = models.LangLocale.objects.get_lang_locale(lang=lang, locale=l10n_lang)
-        olang = olang._replace(name_i18n=locale.caption)
+        olang = olang.replace_i18n_name(locale.caption)
     except (models.Lang.DoesNotExist, models.Lang.MultipleObjectsReturned,
             models.LangLocale.DoesNotExist, models.LangLocale.MultipleObjectsReturned):
         pass
@@ -152,7 +152,7 @@ class PortalService(object):
         :rtype: portal.objects.Language
         """
         if not lang or not isinstance(lang, models.Lang):
-            raise ValueError("lang [{}] is empty or not portal.models.Lang" % (lang,))
+            raise ValueError("lang [%s] is empty or not portal.models.Lang" % (lang,))
 
         if i10n_lang and not isinstance(i10n_lang, objects.Language):
             raise ValueError("base_lang %s is not object.Language" % (lang,))

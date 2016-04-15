@@ -11,7 +11,8 @@ class Language(namedtuple("Language", "code name name_i18n lower_code")):
     def __new__(cls, code, name, name_i18n):
         return super(Language, cls).__new__(cls, code, name, name_i18n, code.lower())
 
-
+    def replace_i18n_name(self, name_i18n):
+        return self._replace(name_i18n=name_i18n)
 # class Language
 
 Language.LANGUAGE_NOT_FOUND = Language(code="NA", name="Not available", name_i18n="Not available")

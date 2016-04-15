@@ -27,7 +27,7 @@ def save_generation(generation):
     :rtype: bool
     """
     if not generation or not isinstance(generation, GenerationResult):
-        raise ValueError("%s generation is empty or not GenerationResult" % (generation))
+        raise ValueError("%s generation is empty or not GenerationResult" % (generation,))
 
     if generation == EMPTY_GENERATION:
         return

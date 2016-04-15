@@ -300,6 +300,7 @@ class PublicationService(object):
         """
         :type lang: portal.objects.Language
         :type menu_item: publications.objects.SubcategoryRef
+        :type page_size: int|long
         :rtype: publications.models.Pager
         """
         core.check_exist_and_type(lang, "lang", portal_objs.Language)

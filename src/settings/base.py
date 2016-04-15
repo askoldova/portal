@@ -162,7 +162,6 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'yaml']
 CELERY_TASK_SERIALIZER = 'pickle'
 
 # === tinymce configuration
-TINYMCE_FILEBROWSER = True
 
 TINYMCE_DEFAULT_CONFIG = dict(
     theme="advanced",

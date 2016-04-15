@@ -11,6 +11,7 @@ class PublicationGenerate(collections.namedtuple("PublicationPageGenerate", "pub
 
 # class PublicationGenerate
 
+
 class OldPublicationGenerate(collections.namedtuple("PublicationPageGenerate", "old_id lang_code")):
     def __new__(cls, old_id, lang_code):
         check_exist_and_type(old_id, "old_id", int, long)

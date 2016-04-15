@@ -10,7 +10,7 @@ from publications import views as pubs
 PREVIEW = 'admin/preview/'
 
 publication_url = r'^{}(?P<lang>\w\w)/(?P<year>\d\d\d\d)/(?P<month>\d\d)/(?P<day>\d\d)/(?P<slug>.+)\.html/?$'
-index_url = r'^{}$';
+index_url = r'^{}$'
 all_publications_url = r'^{}(?P<lang>\w\w)/?$'
 all_publications_page_url = r'^{}(?P<lang>\w\w)/(?P<page>\d+).html$'
 all_old_publications_url = r'^{}(?P<lang>\w\w)/index$'

@@ -24,8 +24,8 @@ def generate_redirect_to_url(original_url, url):
     return gen.GenerationResult(original_url, string)
 
 
-def generate_concrete_redirect(original_url, view_to, view_args=(), view_kwargs={}):
-    url = urlresolvers.reverse(viewname=view_to, args=view_args, kwargs=view_kwargs)
+def generate_concrete_redirect(original_url, view_to, view_args=None, view_kwargs=None):
+    url = urlresolvers.reverse(viewname=view_to, args=view_args or (), kwargs=view_kwargs or {})
     return generate_redirect_to_url(original_url, url)
 
 

@@ -30,6 +30,9 @@ MIN_DATE = datetime.date(1970, 1, 1)
 
 
 class Pager(collections.namedtuple("Pager", "page_nr pages page")):
+    def __new__(cls, *args, **kwargs):
+        return super(Pager, cls).__new__(cls, *args, **kwargs)
+
     def replace_page(self, new_page):
         return self._replace(page=new_page)
 

@@ -11,10 +11,6 @@ def fake_reverse(self, view_name, *args, **kwargs):
 
 class ResolverStub(services.UrlsResolver):
     def get_publication_url(self, language_code, publication_id, publication_date, slug):
-        """
-        :type publication_date: datetime.date
-
-        """
         year = publication_date.year
         month = publication_date.month
         day = publication_date.day

@@ -41,7 +41,7 @@ class Resolver(services.UrlsResolver):
 resolver = Resolver()
 
 
-def generate_pubs_page_view(lang, pager, url, title, portal_service, get_page_url):
+def generate_pubs_page_view(lang, pager, url, title, get_page_url):
     return gen.GenerationResult(
         url=url,
         content=render_to_string("publications.html", context=dict(
@@ -63,8 +63,9 @@ def pages_range(pages, page, urlresolver_func, **kwargs):
     """
     Should return list of pages from pages to one, not more than 13-15 elements.
     Have return first page, null value, page-5 up tp page+5 range, null value, last page
-    :type pages int
-    :type page int
+    :type pages: int
+    :type page: int
+    :type urlresolver_func: types.FunctionType
     :rtype list
     """
     if pages <= 0:
@@ -158,7 +159,7 @@ def generate_all_publications(url, lang):
         raise Http404("Default page is not found")
 
     return generate_pubs_page_view(lang, pager, url, u"Події, новини, заходи",
-                                   portal_service, url_of_all_publications_page)
+                                   url_of_all_publications_page)
 
 
 def generate_all_publications_page(url, lang, page):
@@ -170,7 +171,7 @@ def generate_all_publications_page(url, lang, page):
         raise Http404("Page [{}] is not found".format(page))
 
     return generate_pubs_page_view(lang, pager, url, u"Події, новини, заходи",
-                                   portal_service, url_of_all_publications_page)
+                                   url_of_all_publications_page)
 
 
 def generate_all_old_publications(url, lang):
@@ -347,7 +348,6 @@ def generate_menu_item_last(lang_code, menu_item_id=None, slug=None):
         raise Http404("Publications is not found in menu".format(menu_item_id))
 
     return generate_pubs_page_view(lang_code, pager, menu_item.url, menu_item.title,
-                                   portal_service,
                                    url_of_menu_item_page_func(menu_item_id, slug))
 
 
@@ -441,7 +441,7 @@ def generate_menu_item_page(lang_code, page, menu_item_id=None, slug=None):
 
     url = url_of_menu_item_page(lang_code, menu_item_id, page)
     return generate_pubs_page_view(
-        lang, pager, url, menu_item.title, portal_service,
+        lang, pager, url, menu_item.title,
         url_of_menu_item_page_func(menu_item_id, slug))
 
 

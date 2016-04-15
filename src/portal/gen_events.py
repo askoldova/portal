@@ -3,7 +3,9 @@ import collections
 __author__ = 'andriyg'
 
 class SiteRegenerate(collections.namedtuple("SiteRegenerate", ())):
-    pass
+    def __new__(cls):
+        return super(SiteRegenerate, cls).__new__(cls)
+
 
 class DefaultPageGenerate(collections.namedtuple("DefaultPageGenerate", "language_code")):
     def __new__(cls, language_code):

@@ -8,6 +8,8 @@ __author__ = 'andriyg'
 _logger = logging.getLogger(__file__)
 
 _modules = ()
+
+
 def _load_modules_int(logger):
     modules = set()
     for _app in apps.get_app_configs():
@@ -26,6 +28,8 @@ def _load_modules_int(logger):
         logger.info("Application %s contain no generator " % (_app.label,))
 
     return tuple(modules)
+
+
 # def _load_modules_int
 
 def _load_modules():
@@ -36,6 +40,7 @@ def _load_modules():
 
     return _modules
 
+
 # def _load_modules
 
 def _generate_silent(m, command):
@@ -45,6 +50,7 @@ def _generate_silent(m, command):
     except Exception as e:
         _logger.error("Error generate for %s in %s" % (command, m,), exc_info=e)
         return True
+
 
 def _generate(m, command):
     return m.accept_and_generate(command)
@@ -60,6 +66,6 @@ def schedule_generation(command):
             return True
     # for m in modules
 
-    _logger.warn("Can't generate for: %s" % (command, ))
-# def schedule_generation
+    _logger.warn("Can't generate for: %s" % (command,))
 
+# def schedule_generation

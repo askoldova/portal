@@ -2,8 +2,6 @@ from gettext import gettext as _
 from django import forms
 from django.core.exceptions import ValidationError
 
-__author__ = 'andriy'
-
 from django.contrib import admin
 from . import models
 from django.core import urlresolvers
@@ -13,6 +11,7 @@ from . import generators, publication
 from portal import services as portal_services
 
 portal_service = portal_services.PortalService()
+
 
 class PublicationSubcategoryAdmin(admin.TabularInline):
     model = models.PublicationSubcategory
@@ -32,12 +31,13 @@ class PublicationAdmin(admin.ModelAdmin):
     list_display_links = list_display
     date_hierarchy = "publication_date"
 
-    list_filter = ("state", "locale","rss_stream",)
+    list_filter = ("state", "locale", "rss_stream",)
 
     def get_form(self, request, obj=None, **kwargs):
         if obj:
             slug = str(obj.old_id or obj.slug or obj.id)
-            portal_service.set_entity_filebrowser_path("images", *(publication.FormattedDate(obj.publication_date) + (slug,)))
+            portal_service.set_entity_filebrowser_path("images",
+                                                       *(publication.FormattedDate(obj.publication_date) + (slug,)))
         else:
             portal_service.set_entity_filebrowser_path("images")
         return super(PublicationAdmin, self).get_form(request, obj, **kwargs)

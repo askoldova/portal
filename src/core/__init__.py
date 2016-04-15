@@ -1,5 +1,6 @@
 import os
 
+
 def env(key, default=None, transform=lambda x: x):
     """
     :type key: str
@@ -25,6 +26,7 @@ def bool_env(key, default=False):
     :param default: bool
     :rtype: bool
     """
+
     def __parse_bool(b):
         """
         :type b: str
