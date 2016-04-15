@@ -12,6 +12,21 @@ __author__ = 'andriy'
 
 _PROTOCOL_RE = re.compile(r'^(\w+:)?//')
 
+
+def _load_language_and_locale(lang, l10n_lang):
+    olang = objects.Language(code=lang.code, name=lang.caption, name_i18n=lang.caption)
+    if not l10n_lang:
+        l10n_lang = olang
+    try:
+        l10n_lang = models.Lang.objects.get_by_code(l10n_lang)
+        locale = models.LangLocale.objects.get_lang_locale(lang=lang, locale=l10n_lang)
+        olang = olang._replace(name_i18n=locale.caption)
+    except (models.Lang.DoesNotExist, models.Lang.MultipleObjectsReturned,
+            models.LangLocale.DoesNotExist, models.LangLocale.MultipleObjectsReturned):
+        pass
+    return olang
+
+
 class PortalService(object):
     def __init__(self):
         pass
@@ -131,7 +146,7 @@ class PortalService(object):
         if i10n_lang and not isinstance(i10n_lang, objects.Language):
             raise ValueError("base_lang %s is not object.Language" % (lang,))
 
-        return self._load_language_and_locale(lang, i10n_lang)
+        return _load_language_and_locale(lang, i10n_lang)
 
     # def get_language
 
@@ -152,24 +167,9 @@ class PortalService(object):
         except models.Lang.DoesNotExist or models.Lang.MultipleObjectsReturned:
             return objects.Language.LANGUAGE_NOT_FOUND
 
-        return self._load_language_and_locale(lang, i10n_lang)
+        return _load_language_and_locale(lang, i10n_lang)
 
     # def get_language
-
-    def _load_language_and_locale(self, lang, l10n_lang):
-        olang = objects.Language(code=lang.code, name=lang.caption, name_i18n=lang.caption)
-        if not l10n_lang:
-            l10n_lang = olang
-        try:
-            l10n_lang = models.Lang.objects.get_by_code(l10n_lang)
-            locale = models.LangLocale.objects.get_lang_locale(lang=lang, locale=l10n_lang)
-            olang = olang._replace(name_i18n=locale.caption)
-        except (models.Lang.DoesNotExist, models.Lang.MultipleObjectsReturned,
-                models.LangLocale.DoesNotExist, models.LangLocale.MultipleObjectsReturned):
-            pass
-        return olang
-
-    # def _load_language_and_locale
 
     def get_default_language(self):
         try:
@@ -183,25 +183,35 @@ class PortalService(object):
     def get_languages(self, l10n_lang):
         if not l10n_lang or not isinstance(l10n_lang, objects.Language):
             raise ValueError("Localisation code [] is not a language".format(l10n_lang))
-        return tuple(self._load_language_and_locale(lang, l10n_lang)
+        return tuple(_load_language_and_locale(lang, l10n_lang)
                      for lang in models.Lang.objects.all())
 
     # def get_languages
 
-    def menu_item(self, subcategory_code, lang_code):
-        core.check_exist_and_type(subcategory_code, "subcategory_code", long, int)
+    def menu_item(self, lang_code, subcategory_code, slug):
         core.check_exist_and_type(lang_code, "lang_code", str, unicode)
+        core.check_type(subcategory_code, "subcategory_code", long, int)
+        core.check_type(slug, "slug", str, unicode)
+        if not slug and not subcategory_code:
+            raise ValueError("slug or subcategory_code have to be set")
 
         lang = self.get_language(lang_code)
         try:
-            m = models.MenuItemI18n.objects.by_code_and_lang(subcategory_code, lang_code)
-            return objects.MenuItemRef(m.menu_item.id, m.caption, lang)
-        except models.MenuItemI18n.DoesNotExist:
-            try:
+            if slug:
+                m = models.MenuItem.objects.by_slug(slug)
+            else:
                 m = models.MenuItem.objects.by_code(subcategory_code)
-                return objects.MenuItemRef(m.id, m.caption, lang)
-            except models.MenuItem.DoesNotExist:
-                return objects.MENU_ITEM_NOT_EXIST
+
+            try:
+                i = models.MenuItemI18n.objects.by_code_and_lang(m.id, lang_code)
+                caption = i.caption
+            except models.MenuItemI18n.DoesNotExist:
+                caption = m.caption
+
+            return objects.MenuItemRef(code=m.id, slug=m.slug, title=caption, lang=lang)
+        except models.MenuItem.DoesNotExist:
+            return objects.MENU_ITEM_NOT_EXIST
+
 
 
 

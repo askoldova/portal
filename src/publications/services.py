@@ -18,7 +18,7 @@ class UrlsResolver:
     def get_old_publication_url(self, lang_code, old_id):
         raise NotImplemented()
 
-    def get_subcategory_url(self, language_code, subcategory_id):
+    def get_subcategory_url(self, language_code, subcategory_id, slug):
         raise NotImplemented()
 
 
@@ -270,7 +270,7 @@ class PublicationService(object):
         """
         subcategories = pub.subcategory,
         subcategories += tuple(f.subcategory for f in pub.publicationsubcategory_set.all())
-        return tuple(self.get_menu_item(lang, f.id) for f in subcategories)
+        return tuple(self.get_menu_item(lang, f.id, f.slug) for f in subcategories)
 
     # def _publication_categories_refs
 
@@ -279,16 +279,19 @@ class PublicationService(object):
 
     # def _publication_images
 
-    def get_menu_item(self, lang, menu_item_id):
-        core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
+    def get_menu_item(self, lang, menu_item_id, slug):
         core.check_exist_and_type(lang, "lang", portal_objs.Language)
+        core.check_type(menu_item_id, "menu_item_id", long, int)
+        core.check_type(slug, "slug", unicode, str)
+        if not slug and not menu_item_id:
+            raise ValueError("slug or menu_item_id have to be set")
 
-        menu = self.portal_service.menu_item(menu_item_id, lang.code)
+        menu = self.portal_service.menu_item( lang.code, menu_item_id, slug)
         if menu == portal_objs.MENU_ITEM_NOT_EXIST:
             return objects.PAGE_NOT_FOUND
 
-        url = self.urls_resolver.get_subcategory_url(lang.lower_code, menu_item_id)
-        return objects.SubcategoryRef(lang=lang, code=menu.code, title=menu.title, url=url)
+        url = self.urls_resolver.get_subcategory_url(lang.lower_code, menu_item_id, slug)
+        return objects.SubcategoryRef(lang=lang, code=menu.code, title=menu.title, url=url, slug=menu.slug)
 
     def get_menu_item_last_pubs(self, lang, menu_item, page_size):
         """

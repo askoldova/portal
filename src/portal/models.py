@@ -125,11 +125,17 @@ class MenuItemManager(models.Manager):
 
         return self.get(id=code)
 
+    def by_slug(self, slug):
+        core.check_exist_and_type(slug, "slug", str, unicode)
+
+        return self.get(slug=slug)
+
 
 class MenuItem(models.Model):
     menu = models.ForeignKey(to=MainMenu)
     caption = models.CharField(max_length=100)
     order = models.SmallIntegerField(default=0)
+    slug = models.SlugField(max_length=32, null=True, blank=True)
 
     objects = MenuItemManager()
 

@@ -77,11 +77,12 @@ PUB_NOT_FOUND = PublicationView(pub_date=MIN_DATE, show_date=False, url='',
                                 title='', text='No text', categories=(), images=())
 
 
-class SubcategoryRef(collections.namedtuple("SubcategoryRef", "code title lang url")):
-    def __new__(cls, code, title, lang, url):
+class SubcategoryRef(collections.namedtuple("SubcategoryRef", "code title lang url slug")):
+    def __new__(cls, code, title, lang, url, slug):
         core.check_exist_and_type(code, "code", int, long)
         core.check_exist_and_type(title, "title", str, unicode)
         core.check_exist_and_type(lang, "lang", portal.Language)
         core.check_exist_and_type(url, "url", str, unicode)
-        return super(SubcategoryRef, cls).__new__(cls, code=code, title=title, lang=lang, url=url)
+        core.check_type(slug, "slug", str, unicode)
+        return super(SubcategoryRef, cls).__new__(cls, code=code, title=title, lang=lang, url=url, slug=slug)
 

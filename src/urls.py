@@ -36,10 +36,10 @@ urlpatterns = [
         pubs.all_old_publications_page_view_admin, name='pubs_all_old_publications_page_preview'),
     url(all_publications_page_url.format(PREVIEW),
         pubs.all_old_publications_page_view_admin, name='pubs_all_publications_page_preview'),
-    url(pubs.menu_item_url.format(PREVIEW),
-        pubs.menu_item_view_admin),
-    url(pubs.menu_item_page_url.format(PREVIEW),
-        pubs.menu_item_view_page_admin),
+    url(pubs.menu_item_url.format(PREVIEW), pubs.menu_item_view_admin),
+    url(pubs.menu_item_page_url.format(PREVIEW), pubs.menu_item_view_page_admin),
+    url(pubs.menu_item_url2.format(PREVIEW), pubs.menu_item_view_admin),
+    url(pubs.menu_item_page_url2.format(PREVIEW), pubs.menu_item_view_page_admin),
     url(publication_url.format(PREVIEW), pubs.publication_view_admin, name='pubs_publication_preview'),
 ]
 
@@ -62,5 +62,7 @@ urlpatterns += [
         name='pubs_all_old_publications_page'),
     url(pubs.menu_item_url.format(''), pubs.menu_item_view),
     url(pubs.menu_item_page_url.format(''), pubs.menu_item_view_page),
+    url(pubs.menu_item_url2.format(''), pubs.menu_item_view),
+    url(pubs.menu_item_page_url2.format(''), pubs.menu_item_view_page),
     url(publication_url.format(''), pubs.publication_view),
 ]

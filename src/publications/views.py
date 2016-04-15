@@ -1,8 +1,9 @@
 # coding=utf-8
+import types
 
 from django.contrib.auth.decorators import login_required
 from django.core import urlresolvers
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponsePermanentRedirect
 from django.template.loader import render_to_string
 
 import core
@@ -31,8 +32,8 @@ class Resolver(services.UrlsResolver):
 
         # def get_old_publication_url
 
-    def get_subcategory_url(self, language_code, subcategory_id):
-        return url_of_menu_item(lang_code=language_code, menu_item_id=subcategory_id)
+    def get_subcategory_url(self, language_code, subcategory_id, slug):
+        return url_of_menu_item(lang_code=language_code, menu_item_id=subcategory_id, slug=slug)
 
 
 # class Resolver
@@ -307,82 +308,131 @@ def parse_number_or_http_404(value, error=None):
         raise Http404(error)
 
 
-menu_item_url = r'^{}(?P<lang_code>\w\w)/(?P<menu_item_id>\d+)/?$'
-menu_item_page_url = r'^{}(?P<lang_code>\w\w)/(?P<menu_item_id>\d+)/(?P<page>\d+).html$'
+menu_item_url = r'^{}(?P<lang_code>\w\w)/subcategory(?P<menu_item_id>\d+).html$'
+menu_item_url2 = r'^{}(?P<lang_code>\w\w)/(?P<slug>[\w_-]+).html$'
+menu_item_page_url = r'^{}(?P<lang_code>\w\w)/subcategory(?P<menu_item_id>\d+)/(?P<page>\d+).html$'
+menu_item_page_url2 = r'^{}(?P<lang_code>\w\w)/(?P<slug>[\w_-]+)/(?P<page>\d+).html$'
 
 
-def url_of_menu_item(lang_code, menu_item_id):
+def url_of_menu_item(lang_code, menu_item_id, slug):
     core.check_exist_and_type(lang_code, "lang_code", str, unicode)
-    core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
+    core.check_type(menu_item_id, "menu_item_id", long, int)
+    core.check_type(slug, "slug", str, unicode)
+    core.check_one_required(menu_item_id=menu_item_id, slug=slug)
 
-    return urlresolvers.reverse(menu_item_view, kwargs=dict(lang_code=lang_code, menu_item_id=menu_item_id))
+    if slug:
+        return urlresolvers.reverse(menu_item_view, kwargs=dict(lang_code=lang_code, slug=slug))
+    else:
+        return urlresolvers.reverse(menu_item_view, kwargs=dict(lang_code=lang_code, menu_item_id=menu_item_id))
 
 
-def url_of_menu_item_admin(lang_code, menu_item_id):
+def url_of_menu_item_admin(lang_code, menu_item_id, slug):
     core.check_exist_and_type(lang_code, "lang_code", str, unicode)
-    core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
+    core.check_type(menu_item_id, "menu_item_id", long, int)
+    core.check_type(slug, "slug", str, unicode)
+    core.check_one_required(menu_item_id=menu_item_id, slug=slug)
 
-    return urlresolvers.reverse(menu_item_view_admin, kwargs=dict(lang=lang_code, menu_item_id=menu_item_id))
+    menu_item_id = menu_item_id if not slug else None
+
+    return urlresolvers.reverse(menu_item_view_admin, kwargs=dict(lang=lang_code, menu_item_id=menu_item_id, slug=slug))
 
 
-def generate_menu_item_last(lang, menu_item_id):
-    lang = lang_of(lang)
-    try:
-        menu_item_id = int(menu_item_id)
-    except ValueError:
-        raise Http404("Invalid menu id code {}".format(menu_item_id))
-    menu_item = publications_service.get_menu_item(lang, menu_item_id)
-    if menu_item == objects.PAGE_NOT_FOUND:
-        raise Http404("Menu {} is not found".format(menu_item_id))
+def generate_menu_item_last(lang_code, menu_item_id=None, slug=None):
+    lang_code = lang_of(lang_code)
+    menu_item, menu_item_id = _get_menu_item(lang_code, menu_item_id, slug, url_of_menu_item)
 
-    pager = publications_service.get_menu_item_last_pubs(lang, menu_item, 6)
+    pager = publications_service.get_menu_item_last_pubs(lang_code, menu_item, 6)
     if menu_item == objects.PAGE_NOT_FOUND:
         raise Http404("Publications is not found in menu".format(menu_item_id))
 
-    return generate_pubs_page_view(lang, pager, menu_item.url, menu_item.title,
+    return generate_pubs_page_view(lang_code, pager, menu_item.url, menu_item.title,
                                    portal_service,
-                                   url_of_menu_item_page_func(menu_item_id))
+                                   url_of_menu_item_page_func(menu_item_id, slug))
 
 
-def menu_item_view(request, lang_code, menu_item_id):
-    return HttpResponse(generate_menu_item_last(lang_code, menu_item_id).content)
+def _get_menu_item(lang, menu_item_id, slug, url_cb):
+    """
+    :type lang: portal.objects.Language
+    :type slug: unicode|str
+    :type url_cb: lambda lang_code[str|unicode], menu_item_id[int|long], slug[str|unicode]: [str|unicode]
+    """
+    core.check_exist_and_type2(portal_objs.Language, lang=lang)
+    core.check_exist_and_type2(types.FunctionType, url_cb=url_cb)
+    core.check_string(slug=slug)
+    core.check_one_required(menu_item_id=menu_item_id, slug=slug)
 
+    lang_code = lang.lower_code
+    try:
+        menu_item_id = int(menu_item_id) if menu_item_id and not slug else None
+    except ValueError:
+        raise Http404("Invalid menu id code {}".format(menu_item_id))
+    menu_item = publications_service.get_menu_item(lang, menu_item_id, slug)
+    if menu_item == objects.PAGE_NOT_FOUND:
+        raise Http404("Menu {} is not found".format(menu_item_id or slug))
+    if menu_item.slug and not slug:
+        raise core.HttpRedirect(url_cb(lang_code=lang_code, menu_item_id=None, slug=menu_item.slug))
+    return menu_item, menu_item_id
+
+
+def generation_or_redirect(function, **params):
+    core.check_exist_and_type2(types.FunctionType, function=function)
+    try:
+        _gen = function(**params)
+        core.check_exist_and_type(_gen, "{}({})".format(function, params), gen.GenerationResult)
+        return HttpResponse(_gen.content)
+    except core.HttpRedirect as r:
+        return HttpResponsePermanentRedirect(r.url)
+
+
+def menu_item_view(request, lang_code, menu_item_id=None, slug=None):
+    return generation_or_redirect(generate_menu_item_last, lang_code=lang_code, menu_item_id=menu_item_id, slug=slug)
 
 menu_item_view_admin = login_required(menu_item_view)
 
 
-def url_of_menu_item_page_func(menu_item_id):
-    core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
+def url_of_menu_item_page_func(menu_item_id, slug):
+    core.check_type(menu_item_id, "menu_item_id", long, int)
+    core.check_type(slug, "slug", unicode, str)
+    if not slug and not menu_item_id:
+        raise ValueError("slug or menu_item_id have to be set")
 
     def fun(lang_code, page):
-        return url_of_menu_item_page(lang_code, menu_item_id, page)
+        return url_of_menu_item_page(lang_code, page=page, menu_item_id=menu_item_id, slug=slug)
 
     return fun
 
 
-def url_of_menu_item_page(lang_code, menu_item_id, page):
+def url_of_menu_item_page(lang_code, page, menu_item_id=None, slug=None):
     core.check_exist_and_type(lang_code, "lang_code", str, unicode)
-    core.check_exist_and_type(menu_item_id, "menu_item_id", long, int)
     core.check_exist_and_type(page, "page", long, int)
+    core.check_type(menu_item_id, "menu_item_id", long, int)
+    core.check_type(slug, "slug", unicode, str)
+    if not slug and not menu_item_id:
+        raise ValueError("slug or menu_item_id have to be set")
 
-    return urlresolvers.reverse(menu_item_view_page,
-                                kwargs=dict(lang_code=lang_code, menu_item_id=menu_item_id, page=page))
+    if slug:
+        return urlresolvers.reverse(menu_item_view_page,
+                                    kwargs=dict(lang_code=lang_code, page=page, slug=slug))
+    else:
+        return urlresolvers.reverse(menu_item_view_page,
+                                    kwargs=dict(lang_code=lang_code, page=page, menu_item_id=menu_item_id))
 
 
-def generate_menu_item_page(lang_code, menu_item_id, page):
+def _url_cb_of_menu_item_page(page):
+    _page = page
+    return lambda lang_code, menu_item_id, slug: \
+        url_of_menu_item_page(lang_code=lang_code, menu_item_id=menu_item_id, slug=slug, page=_page)
+
+
+def generate_menu_item_page(lang_code, page, menu_item_id=None, slug=None):
     lang = lang_of(lang_code)
-    try:
-        menu_item_id = int(menu_item_id)
-    except ValueError:
-        raise Http404("Invalid menu id code {}".format(menu_item_id))
-    menu_item = publications_service.get_menu_item(lang, menu_item_id)
-    if menu_item == objects.PAGE_NOT_FOUND:
-        raise Http404("Menu {} is not found".format(menu_item_id))
-
     try:
         page = int(page)
     except ValueError:
         raise Http404("Invalid page number {}".format(page))
+
+    menu_item, menu_item_id = _get_menu_item(lang, menu_item_id, slug,
+                                             _url_cb_of_menu_item_page(page))
 
     pager = publications_service.get_menu_item_pubs_page(lang, menu_item, page=page, page_size=6)
     if pager == objects.PAGE_NOT_FOUND:
@@ -391,11 +441,11 @@ def generate_menu_item_page(lang_code, menu_item_id, page):
     url = url_of_menu_item_page(lang_code, menu_item_id, page)
     return generate_pubs_page_view(
         lang, pager, url, menu_item.title, portal_service,
-        url_of_menu_item_page_func(menu_item_id))
+        url_of_menu_item_page_func(menu_item_id, slug))
 
 
-def menu_item_view_page(request, lang_code, menu_item_id, page):
-    return HttpResponse(generate_menu_item_page(lang_code, menu_item_id, page).content)
+def menu_item_view_page(request, lang_code, page, menu_item_id=None, slug=None):
+    return generation_or_redirect(generate_menu_item_page, lang_code=lang_code, menu_item_id=menu_item_id, slug=slug, page=page)
 
 
 menu_item_view_page_admin = login_required(menu_item_view_page)
