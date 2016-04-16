@@ -47,7 +47,7 @@ class PublicationManager(models.Manager):
 
     def get_by_land_and_old_id(self, lang_code, old_id):
         """
-        :type lang_code: basestring
+        :type lang_code: str|unicode
         :type old_id: long
         :rtype: publications.models.Publication
         """
@@ -137,7 +137,7 @@ class PublicationManager(models.Manager):
         :type lang_code: basestring
         :type publication_date: datetime.date
         :type publication_id: long
-        :type slug: basestring
+        :type slug: str|unicode
         :rtype: publications.models.Publication
         """
         next_pub_date = publication_date + datetime.timedelta(days=1)

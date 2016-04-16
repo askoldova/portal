@@ -45,7 +45,8 @@ def generate_pubs_page_view(lang, pager, url, title, get_page_url):
     return gen.GenerationResult(
         url=url,
         content=render_to_string("publications.html", context=dict(
-            menuItems=publications_service.get_main_menu(lang),
+            main_url=url_of_all_publications(lang.lower_code),
+            menu_items=publications_service.get_main_menu(lang),
             langs=portal_service.get_languages(lang),
             lang=lang,
             page_nr=pager.page_nr,
@@ -154,7 +155,7 @@ def url_of_all_publications_page(lang_code, page):
 
 def generate_all_publications(url, lang):
     lang = lang_of(lang)
-    pager = publications_service.get_last_publications(lang, False, 6)
+    pager = publications_service.get_last_publications(lang, 6)
     if pager == objects.PAGE_NOT_FOUND:
         raise Http404("Default page is not found")
 

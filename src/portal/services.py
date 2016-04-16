@@ -3,6 +3,7 @@ import re
 from django.conf import settings
 from django.contrib.sites.models import Site
 import filebrowser
+from django.core.urlresolvers import reverse
 from filebrowser import functions as fbfunctions
 
 import core
@@ -82,7 +83,7 @@ class PortalService(object):
     # def full_url
 
     def resolve_to_full_url(self, view_name, site_id=None, *args, **kwargs):
-        return self.full_url(self.reverse(view_name, args=args, kwargs=kwargs), site_id)
+        return self.full_url(reverse(view_name, args=args, kwargs=kwargs), site_id)
     # def full_url
 
     """

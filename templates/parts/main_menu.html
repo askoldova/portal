@@ -1,0 +1,22 @@
+<div class="chromestyle" id="chromemenu">
+    <ul>
+        <li><a href="{{ main_url }}">Головна</a></li>
+        {% for item in menu_items %}
+            <li><a href="#" rel="dropmenu{{ forloop.counter }}">{{ item.title }}</a>
+        {% endfor %}
+    </ul>
+</div>
+
+{% for item in menu_items %}
+    <div id="dropmenu{{ forloop.counter }}" class="dropmenudiv" {% if item.width > 0 %}style="width: {{ item.width }}px;"{% endif %}>
+        {% for i2 in item.items %}
+            <a href="{{ i2.url }}">
+                {{ i2.title }}
+            </a>
+        {% endfor %}
+    </div>
+{% endfor %}
+
+<script type="text/javascript">
+    cssdropdown.startchrome("chromemenu")
+</script>

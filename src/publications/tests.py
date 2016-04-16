@@ -65,6 +65,7 @@ def _setup():
 # def _setup
 
 
+# noinspection PyUnusedLocal
 class PublicationsServicesTest(TestCase):
     def __init__(self, method_name='runTest'):
         super(PublicationsServicesTest, self).__init__(method_name)

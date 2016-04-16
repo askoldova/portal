@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>{% block title %}Title{% endblock %}</title>
+    <title>{% block title %}{{ title }}{% endblock %}</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     {% if rss_link %}
         <link rel=”alternate” type=”application/rss+xml” title=”Підписка на RSS-новини” href=”${rss_link}”>
@@ -52,17 +52,14 @@
             <!-- div id content -->
 
             <div class="left">
-                <am:plugin name="last-subcat-pub" var1="50"/>
-                <am:plugin name="node-head" var1="58"/>
+                <!-- am:plugin name="last-subcat-pub" var1="50"/>
+                <am:plugin name="node-head" var1="58"/ -->
                 <div class="column_text" style="color:#E56E0D;">
                     <p style="text-align: center">
                         <a href="register">Реєстрація бажаючих отримувати найважливішу інформацію від нашої церкви</a>
                     </p>
                 </div>
                 <h1><a href="needs-in-help">Потребую допомоги</a></h1>
-                <c:if test="${requestScope['com.gushuley.portal.CurrentLogin'].auth}">
-                    <a href="logout">Logout</a> :: <a href="item-edit">Write</a>
-                </c:if>
 
             </div>
             <!-- div class left -->
@@ -70,9 +67,9 @@
         <!-- div class wrap -->
         <div class="right">
             <a href="needs-in-pray"><img src="/images/molytva.jpg" border="0" alt="Потреба в молитві"></a>
-            <am:plugin name="efficiency" var1="11"/>
+            <!-- am:plugin name="efficiency" var1="11"/>
             <am:plugin name="node-link" var1="1458"/>
-            <am:plugin name="node-link" var1="1456"/>
+            <am:plugin name="node-link" var1="1456"/ -->
             <h1><a>Знайдіть нас у Facebook</a></h1>
             <div class="column_text" style="color:#E56E0D;">
                 <div id="fb-root"></div>
@@ -87,7 +84,7 @@
                 <div class="fb-like-box" data-href="http://www.facebook.com/AskoldovaMohyla" data-width="224"
                      data-height="315" data-show-faces="true" data-stream="false" data-header="false"></div>
             </div>
-            <am:plugin name="node-link" var1="1457"/>
+            <!-- am:plugin name="node-link" var1="1457"/ -->
         </div>
         <!-- div class right -->
         <div id="sub_footer">
@@ -132,58 +129,12 @@
     </div>
     <!-- div id header -->
     <div id="menu">
-        <div class="chromestyle" id="chromemenu">
-            <ul>
-                <li><a href="{{ langUrl }}">Головна</a></li>
-                {% for item in menuItems %}
-                    <li><a href="#" rel="dropmenu{{ forloop.counter }}">{{ item.title }}</a>
-                {% endfor %}
-            </ul>
-        </div>
-
-        {% for item in menuItems %}
-            <div id="dropmenu{{ forloop.counter }}" class="dropmenudiv" {% if item.width > 0 %}style="width: {{ item.width }}px;"{% endif %}>
-                {% for i2 in item.items %}
-                    <a href="{{ i2.url }}">
-                        {{ i2.title }}
-                    </a>
-                {% endfor %}
-            </div>
-        {% endfor %}
-
-        <script type="text/javascript">
-            cssdropdown.startchrome("chromemenu")
-        </script>
-
+        {% include "parts/main_menu.html" %}
     </div>
     <!-- div id menu -->
 
 </div>
 <!-- div id gordi -->
-<!-- euromaidan -->
-<a href="http://stfalcon.github.io/euromaidan/" class="em-ribbon"
-   style="position: absolute; left:0; top:0; width: 90px; height: 90px; background: url('http://stfalcon.github.io/euromaidan/img/em-ribbon.png'); z-index: 2013; border: 0;"
-   title="Розмісти стрічку з символікою України і ЄС на своєму сайті!" target="_blank"></a>
-<!-- euromaidan -->
-<c:if test="${not requestScope['com.gushuley.portal.CurrentLogin'].auth}">
-    <!--  google analytics -->
-    <script type="text/javascript">
-        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-    </script>
-    <script type="text/javascript">
-        var pageTracker = _gat._getTracker("UA-4235298-3");
-        pageTracker._trackPageview();
-    </script>
-    <!-- YaMetrics begin -->
-    <script type="text/javascript"><!--
-    var ya_cid = 163976;
-    //--></script>
-    <script src="http://bs.yandex.ru/resource/watch.js" type="text/javascript"></script>
-    <noscript>
-        <div style="display: inline;"><img src="http://bs.yandex.ru/watch/163976" width="1" height="1" alt=""/></div>
-    </noscript>
-    <!-- YaMetrics end -->
-</c:if>
+{%  include "parts/counters.html" %}
 </body>
 </html>

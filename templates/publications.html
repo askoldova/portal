@@ -2,10 +2,8 @@
 {% load i18n %}
 {% block content %}
     <div class="contentheading">{{ title }}</div>
-    <div>
     {% for p in page %}
-        <div>
-            <h1><a href="{{ p.url }}">{{ p.title }}</a></h1>
+        <h1><a href="{{ p.url }}">{{ p.title }}</a></h1>
         {% if p.show_date %}
             <p><span class="date">{{ p.publication_date | date:"Y-m-d" }}</span></p>
         {% endif %}
@@ -21,25 +19,21 @@
                 {% trans "Read more..." %}
             {% endif %}</a>
         </p>
-
-    </div>
     {% endfor %}
-</div>
     <div class="paginator" id="paginator">
-    <p>
-    {% for p, url in pages_range %}
-        {% if url %}
-            <a href="{{ url }}">{{ p }}</a>
-        {% else %}
-            {{ p }}
-        {% endif %}&nbsp;
-    {% endfor %}
-    </p>
+        <p>
+            {% for p, url in pages_range %}
+                {% if url %}
+                    <a href="{{ url }}">{{ p }}</a>
+                {% else %}
+                    {{ p }}
+                {% endif %}&nbsp;
+            {% endfor %}
+        </p>
     </div>
     <!-- {{ pages }} pages, page: {{ page_nr }}, navigate_url: {{ navigate_url }}-->
     <div class="paginator_pages">{{ pages }} сторінок</div>
     <script type="text/javascript">
         var p = new Paginator('paginator', {{ pages }}, 15, {{ page_nr }}, '{{ navigate_url }}', '999999');
     </script>
-    </div>
 {% endblock %}

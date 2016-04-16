@@ -1,11 +1,10 @@
 import datetime
 
 import core
-import publications
 import publications.views
 
 from . import models, objects, STATUS_PUBLISHED, STATUS_HIDDEN
-from portal import objects as portal_objs, models as portal_models
+from portal import objects as portal_objs
 
 
 class UrlsResolver:
@@ -72,11 +71,10 @@ class PublicationService(object):
 
     # def _load_pub_ref
 
-    def get_last_publications(self, lang, published, page_size):
+    def get_last_publications(self, lang, page_size):
         """
         :type lang: portal.objects.Language
         :type page_size: long
-        :type published: boolean
         :rtype: publications.models.Pager
         """
         if not lang or not isinstance(lang, portal_objs.Language):
