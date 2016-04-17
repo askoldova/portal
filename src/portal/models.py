@@ -1,8 +1,7 @@
 from django.db import models
 
-# Create your models here.
 import core
-
+6
 
 class LangManager(models.Manager):
     def get_default(self):

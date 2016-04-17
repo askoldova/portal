@@ -56,13 +56,13 @@ class PublicationAdmin(admin.ModelAdmin):
                                         kwargs=dict(lang=obj.locale.code.lower(), year=year, month=month, day=day,
                                                     slug=slug))
         return None
-    # get_view_on_site_url
+        # get_view_on_site_url
+
 
 # class PublicationAdmin
 
 
 class ConfigurationForm(forms.ModelForm):
-
     class Meta:
         model = models.Configuration
         exclude = ()
@@ -73,15 +73,27 @@ class ConfigurationForm(forms.ModelForm):
         if (not self.instance or not self.instance.id) and models.Configuration.objects.filter():
             raise ValidationError(_(u"Can't sore configuration, because only one instance is allowed"))
         return clean_data
-    # def clean
+        # def clean
+
+
 # class ConfigurationForm
 
 
 class ConfigurationAdmin(admin.ModelAdmin):
     form = ConfigurationForm
     raw_id_fields = ('last_old_publication',)
-# class ConfigurationAdmin
+
+
+class PortalRegionContent(admin.StackedInline):
+    model = models.PortalRegionContent
+    raw_id_fields = ("publication",)
+
+
+class PortalRegionAdmin(admin.ModelAdmin):
+    inlines = (PortalRegionContent,)
+
 
 admin.site.register(models.Publication, PublicationAdmin)
 admin.site.register(models.RssImportStream)
 admin.site.register(models.Configuration, ConfigurationAdmin)
+admin.site.register(models.PortalRegion, PortalRegionAdmin)

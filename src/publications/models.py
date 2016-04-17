@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
+import core
 import generation
 from . import gen_events
 
@@ -60,7 +61,7 @@ class PublicationManager(models.Manager):
         pages, remind = divmod(at_all['id__count'], page_size)
         if remind > 0:
             pages += 1
-        return pages, remind
+        return pages or 1, remind
 
     # def `_count_pages
 
@@ -70,6 +71,7 @@ class PublicationManager(models.Manager):
         pages, remind = self._count_pages(page_size, q)
 
         return Pager(page_nr=pages, pages=pages, page=tuple(q[:page_size]))
+
     def pager_and_last_menu_pubs(self, page_size, lang_code, menu_item_id):
         page_size, q = self._fix_page_size_and_get_pub_query(lang_code, page_size)
         q = q.filter(subcategory__id=menu_item_id) | \
@@ -166,7 +168,7 @@ class Publication(models.Model):
     author = models.ForeignKey(to=User, null=True, blank=True)
 
     rss_stream = models.ForeignKey(to=RssImportStream, null=True, blank=True)
-    rss_url = models.CharField(max_length=255, null=True, blank=True)
+    rss_url = models.CharField(max_length=512, null=True, blank=True)
     old_id = models.IntegerField(null=True, blank=True, db_index=True)
 
     objects = PublicationManager()
@@ -252,3 +254,27 @@ class Configuration(models.Model):
         return u"Configuration"
 
 # class Configuration
+
+
+class PortalRegion(models.Model):
+    region_name = models.CharField(max_length=64, unique=True)
+
+
+class PortalRegionContentManager(models.Manager):
+    def get_by_region_name(self, region_name):
+        core.check_string_value(region_name=region_name)
+
+        return self.filter(region__region_name=region_name)
+
+
+class PortalRegionContent(models.Model):
+    region = models.ForeignKey(to=PortalRegion)
+    latest_from = models.ForeignKey(to=portal.MenuItem, blank=True, null=True, related_name="latest_from_regions")
+    one_from = models.ForeignKey(to=portal.MenuItem, blank=True, null=True, related_name="one_from_regions")
+    publication = models.ForeignKey(to=Publication, blank=True, null=True)
+    text = tinymce.HTMLField(blank=True, null=True)
+
+    objects = PortalRegionContentManager()
+
+    class Meta:
+        ordering = ("id",)
