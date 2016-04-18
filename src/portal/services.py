@@ -15,11 +15,14 @@ _PROTOCOL_RE = re.compile(r'^(\w+:)?//')
 
 
 def _load_language_and_locale(lang, l10n_lang):
+    core.check_exist_and_type2(lang, objects.Language)
+    core.check_type2(l10n_lang, objects.Language)
+
     olang = objects.Language(code=lang.code, name=lang.caption, name_i18n=lang.caption)
     if not l10n_lang:
         l10n_lang = olang
     try:
-        l10n_lang = models.Lang.objects.get_by_code(l10n_lang)
+        l10n_lang = models.Lang.objects.get_by_code(l10n_lang.code)
         locale = models.LangLocale.objects.get_lang_locale(lang=lang, locale=l10n_lang)
         olang = olang.replace_i18n_name(locale.caption)
     except (models.Lang.DoesNotExist, models.Lang.MultipleObjectsReturned,
@@ -218,13 +221,15 @@ class PortalService(object):
         except models.MenuItem.DoesNotExist:
             return objects.MENU_ITEM_NOT_EXIST
 
-
     def main_menu(self, language):
+        """
+        :type language: portal.objects.Language
+        """
         core.check_exist_and_type2(objects.Language, language=language)
 
         menu_item = objects.MenuRef(-1, "None", 0, ())
         menu = ()
-        for s in models.MenuItem.objects.main_menu_items():
+        for s in models.MenuItem.objects.main_menu_items(lang_code=language.code):
             if menu_item.code != s.menu.id:
                 if menu_item.code > -1:
                     menu += (menu_item,)

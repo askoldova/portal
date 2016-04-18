@@ -61,11 +61,11 @@ class PublicationPreview(collections.namedtuple("PublicationPreview",
 
 
 class PublicationView(collections.namedtuple("PublicationView",
-                                             "url title pub_date show_date text "
+                                             "lang url title pub_date show_date text "
                                              "categories images")):
-    def __new__(cls, pub_date, show_date, title, text, categories, images, url):
+    def __new__(cls, lang, pub_date, show_date, title, text, categories, images, url):
         return super(PublicationView, cls). \
-            __new__(cls, pub_date=pub_date, show_date=show_date, title=title,
+            __new__(cls, lang=lang, pub_date=pub_date, show_date=show_date, title=title,
                     text=text, categories=categories, images=images, url=url)
 
         # def __new__
@@ -74,7 +74,7 @@ class PublicationView(collections.namedtuple("PublicationView",
 # class PublicationView
 
 
-PUB_NOT_FOUND = PublicationView(pub_date=MIN_DATE, show_date=False, url='',
+PUB_NOT_FOUND = PublicationView(lang=portal.LANGUAGE_NOT_FOUND, pub_date=MIN_DATE, show_date=False, url='',
                                 title='', text='No text', categories=(), images=())
 
 

@@ -1,7 +1,7 @@
 from django.db import models
 
 import core
-6
+
 
 class LangManager(models.Manager):
     def get_default(self):
@@ -10,6 +10,7 @@ class LangManager(models.Manager):
     # def get_default
 
     def get_by_code(self, code):
+        core.check_string_value(code=code)
         return self.get(code=code)
 
         # def get_by_code

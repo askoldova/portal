@@ -41,12 +41,17 @@ class Resolver(services.UrlsResolver):
 resolver = Resolver()
 
 
+def main_menu(lang):
+    return dict(
+        main_url=url_of_all_publications(lang.lower_code),
+        menu_items=publications_service.get_main_menu(lang)
+    )
+
+
 def generate_pubs_page_view(lang, pager, url, title, get_page_url):
     return gen.GenerationResult(
         url=url,
         content=render_to_string("publications.html", context=dict(
-            main_url=url_of_all_publications(lang.lower_code),
-            menu_items=publications_service.get_main_menu(lang),
             langs=portal_service.get_languages(lang),
             lang=lang,
             page_nr=pager.page_nr,
@@ -55,7 +60,8 @@ def generate_pubs_page_view(lang, pager, url, title, get_page_url):
             navigate_url=get_page_url(lang.lower_code, 999999),
             pages_range=pages_range(pager.pages, pager.page_nr, get_page_url,
                                     lang_code=lang.lower_code),
-            title=title
+            title=title,
+            **main_menu(lang)
         ))
     )
 
@@ -253,7 +259,7 @@ def _render_publication(url, pub):
     :type pub: publications.objects.PublicationView
     :rtype: generation.GenerationResult
     """
-    context = dict(publication=pub)
+    context = dict(publication=pub, **main_menu(pub.lang))
     core.check_exist_and_type(pub, "publication", objects.PublicationView)
     return gen.GenerationResult(url=url,
                                 content=render_to_string("publication.html",
