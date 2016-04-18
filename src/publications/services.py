@@ -337,4 +337,23 @@ class PublicationService(object):
 
         return menu
 
-# class PublicationService
+    def get_portal_regions(self, lang):
+        """
+        :type lang: portal.objects.Language
+        :rtype: dict[string]publication.objects.RegionItem
+        """
+
+        regions = {}
+        for item in models.PortalRegionContent.objects.all():
+            if item.latest_from:
+                pass
+            if item.one_from:
+                pass
+            if item.publication:
+                pass
+            else:
+                region = objects.RegionItem(title=item.title, url=item.url, body=item.text)
+
+            regions[item.region.region_name] = getattr(regions, item.region.region_name, ()) + (region,)
+
+        return regions

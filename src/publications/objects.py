@@ -95,3 +95,11 @@ class CategoryRef(collections.namedtuple("CategoryRef", "code title width items"
         core.check_type2(tuple, items=items)
         core.check_int(width=width)
         return super(CategoryRef, cls).__new__(cls, code=code, title=title, width=width, items=items)
+
+
+class RegionItem(collections.namedtuple("RegionItem", "title url body")):
+    def __new__(cls, title, url, body):
+        core.check_string(title=title)
+        core.check_string(url=url)
+        core.check_string(body=body)
+        return super(RegionItem, cls).__new__(cls, title, url, body)

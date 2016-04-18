@@ -42,10 +42,16 @@ resolver = Resolver()
 
 
 def main_menu(lang):
-    return dict(
+    """
+    :type lang: portal.objects.Language
+    :rtype: dict
+    """
+    values = dict(
         main_url=url_of_all_publications(lang.lower_code),
         menu_items=publications_service.get_main_menu(lang)
     )
+    values.update(**publications_service.get_portal_regions(lang))
+    return values
 
 
 def generate_pubs_page_view(lang, pager, url, title, get_page_url):

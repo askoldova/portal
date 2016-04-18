@@ -269,12 +269,15 @@ class PortalRegionContentManager(models.Manager):
 
 class PortalRegionContent(models.Model):
     region = models.ForeignKey(to=PortalRegion)
+    order = models.IntegerField(default=100)
     latest_from = models.ForeignKey(to=portal.MenuItem, blank=True, null=True, related_name="latest_from_regions")
     one_from = models.ForeignKey(to=portal.MenuItem, blank=True, null=True, related_name="one_from_regions")
     publication = models.ForeignKey(to=Publication, blank=True, null=True)
+    title = models.CharField(max_length=256, blank=True, null=True)
+    url = models.CharField(max_length=256, blank=True, null=True)
     text = tinymce.HTMLField(blank=True, null=True)
 
     objects = PortalRegionContentManager()
 
     class Meta:
-        ordering = ("id",)
+        ordering = ("region__region_name", "order", "id", )

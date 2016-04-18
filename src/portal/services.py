@@ -229,7 +229,7 @@ class PortalService(object):
 
         menu_item = objects.MenuRef(-1, "None", 0, ())
         menu = ()
-        for s in models.MenuItem.objects.main_menu_items(lang_code=language.code):
+        for s in models.MenuItem.objects.main_menu_items():
             if menu_item.code != s.menu.id:
                 if menu_item.code > -1:
                     menu += (menu_item,)
