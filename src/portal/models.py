@@ -150,7 +150,7 @@ class MenuItem(models.Model):
         ordering = ('menu__hidden', 'menu__order', 'order', 'caption')
 
     def __unicode__(self):
-        return u'%s-%s' % (self.menu.caption, self.caption)
+        return u'%s -- %s' % (self.menu.caption, self.caption)
 
 
 # def MenuItem
@@ -181,7 +181,7 @@ class MenuItemI18n(models.Model):
         ordering = ('menu__order', 'locale__code')
 
     def __unicode__(self):
-        return u'%s-%s>(%s) %s' % (self.menu.caption, self.menu_item.caption,
+        return u'%s -- %s>(%s) %s' % (self.menu.caption, self.menu_item.caption,
                                    self.locale.code, self.caption)
 
 # def MenuItemI18n
