@@ -354,6 +354,8 @@ class PublicationService(object):
             else:
                 region = objects.RegionItem(title=item.title, url=item.url, body=item.text)
 
-            regions[item.region.region_name] = getattr(regions, item.region.region_name, ()) + (region,)
+            if not item.region.region_name in regions:
+                regions[item.region.region_name] = ()
+            regions[item.region.region_name] = regions[item.region.region_name] + (region,)
 
         return regions

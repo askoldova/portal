@@ -1,38 +1,21 @@
-node_link
-
-<%@ page language="java" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="/WEB-INF/c.tld" %>
-<%@ taglib prefix="am" uri="/WEB-INF/gushuley-portal.tld" %>
-<h1><a href="node,${portalPlugin.item.publication.subcats[0].key}">${portalPlugin.item.title}</a></h1>
-<div class="column_text" style="color:#E56E0D;">
-    ${portalPlugin.item.textShort}
-</div>
-
-
-last_node_item
-
-<%@ page language="java" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="/WEB-INF/c.tld" %>
-<%@ taglib prefix="am" uri="/WEB-INF/gushuley-portal.tld" %>
-<h1><a href="node,${portalPlugin.item.subcats[0].key}">
-    <am:caption item="${portalPlugin.item.subcats[0].captions}"/>
-</a></h1>
-<div class="column_text" style="color:#E56E0D;">
-    ${portalPlugin.item.text}
-</div>
-
-node_head
-
-<%@ page language="java" contentType="text/html; charset=UTF-8" %>
-<%@ taglib uri="/WEB-INF/gushuley-portal.tld" prefix="gp" %>
-<%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
-<h1><a href="node,${items.subcategory.key}"><gp:caption item="${items.subcategory.captions}"/></a></h1>
-<div class="column_text">
-    <c:forEach var="i" items="${items.items}">
-        <h2><a href="#"></a></h2>
-        <p><a href="${i.link}">${i.caption}</a></p>
-        ${i.text}
-        <a href="${i.link}" class="readon">Докладніше</a>
-    </c:forEach>
-</div>
-
+{% if i.title %}
+    <h1><a href="{{ i.url }}">{{ i.title }}</a></h1>
+{% endif %}
+{% if i.body %}
+    <div class="column_text" style="color:#E56E0D;">
+        {{ i.body | safe }}
+    </div>
+{% endif %}
+{% if i.items %}
+    <div class="column_text">
+        {% for i in i.items %}
+            <p><a href="{{ i.url }}">{{ i.title }}</a></p>
+            {{ i.text | safe }}
+            <a href="{{ i.url }}" class="readon">Докладніше</a>
+            {% if not forloop.last %}
+                <h2><a href="#"></a></h2>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+{{ i }}
