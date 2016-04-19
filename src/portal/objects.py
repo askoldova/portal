@@ -19,18 +19,10 @@ Language.LANGUAGE_NOT_FOUND = Language(code="NA", name="Not available", name_i18
 LANGUAGE_NOT_FOUND = Language.LANGUAGE_NOT_FOUND
 
 
-class MenuItemRef(namedtuple("MenuItemRef", "code slug title language")):
-    def __new__(cls, lang, code, slug, title):
-        return super(MenuItemRef, cls).__new__(cls, code=code, slug=slug, title=title, language=lang)
-
-
-MENU_ITEM_NOT_EXIST = MenuItemRef(0, None, "Does not exists", LANGUAGE_NOT_FOUND)
-
-
 class MenuRef(namedtuple("MenuRef", "code title width items")):
     def __new__(cls, code, title, width, items):
         width = long(width) if width else None
-        core.check_int_value(code=code)
+        core.check_int(code=code)
         core.check_string_value(title=title)
         core.check_type2(tuple, items=items)
 
@@ -40,3 +32,14 @@ class MenuRef(namedtuple("MenuRef", "code title width items")):
         core.check_exist_and_type2(MenuItemRef, submenu_item=submenu_item)
 
         return MenuRef(self.code, self.title,  self.width, self.items + (submenu_item,))
+
+MENU_NOT_EXIST = MenuRef(0, "Does not exists", 0, ())
+
+
+class MenuItemRef(namedtuple("MenuItemRef", "code slug title menu language")):
+    def __new__(cls, lang, code, slug, title, menu):
+        return super(MenuItemRef, cls).__new__(cls, code=code, slug=slug, title=title, language=lang, menu=menu)
+
+
+MENU_ITEM_NOT_EXIST = MenuItemRef(0, None, "Does not exists", LANGUAGE_NOT_FOUND, MENU_NOT_EXIST)
+
