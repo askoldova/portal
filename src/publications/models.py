@@ -32,8 +32,28 @@ class RssImportStream(models.Model):
 
     objects = RssImportStreamManager()
 
+    def __unicode__(self):
+        return u"{}".format(self.menu_item.caption)
 
 # enc class RssImportStream
+
+
+def publication_filter_by_subcategory(menu_item_id, q):
+    core.check_exist_and_type2(models.QuerySet, q=q)
+    core.check_exist_and_type2(int, long, menu_item_id=menu_item_id)
+
+    q = q.filter(subcategory__id=menu_item_id) | \
+        q.filter(publicationsubcategory__subcategory__id=menu_item_id)
+    return q
+
+
+def publication_filter_by_category(main_menu_id, q):
+    core.check_exist_and_type2(models.QuerySet, q=q)
+    core.check_exist_and_type2(int, long, main_menu_id=main_menu_id)
+
+    q = q.filter(subcategory__menu__id=main_menu_id) | \
+        q.filter(publicationsubcategory__subcategory__menu__id=main_menu_id)
+    return q
 
 
 class PublicationManager(models.Manager):
@@ -74,8 +94,7 @@ class PublicationManager(models.Manager):
 
     def pager_and_last_menu_pubs(self, page_size, lang_code, menu_item_id):
         page_size, q = self._fix_page_size_and_get_pub_query(lang_code, page_size)
-        q = q.filter(subcategory__id=menu_item_id) | \
-            q.filter(publicationsubcategory__subcategory__id=menu_item_id)
+        q = publication_filter_by_subcategory(menu_item_id, q)
 
         pages, remind = self._count_pages(page_size, q)
 
@@ -83,8 +102,7 @@ class PublicationManager(models.Manager):
 
     def pager_and_menu_pubs_page(self, page, page_size, lang_code, menu_item_id):
         page_size, q = self._fix_page_size_and_get_pub_query(lang_code, page_size)
-        q = q.filter(subcategory__id=menu_item_id) | \
-            q.filter(publicationsubcategory__subcategory__id=menu_item_id)
+        q = publication_filter_by_subcategory(menu_item_id, q)
 
         return self._get_page_from_query(page, page_size, q)
 
@@ -258,6 +276,13 @@ class Configuration(models.Model):
 
 class PortalRegion(models.Model):
     region_name = models.CharField(max_length=64, unique=True)
+
+    def __unicode__(self):
+        name = self.region_name
+        for i in self.portalregioncontent_set.all():
+            name += u"\n{}".format(i.latest_from or i.one_from
+                                   or (i.publication.title if i.publication else None) or i.title)
+        return name
 
 
 class PortalRegionContentManager(models.Manager):

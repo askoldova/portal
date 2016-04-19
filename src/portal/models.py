@@ -148,7 +148,7 @@ class MenuItem(models.Model):
 
     class Meta:
         unique_together = ('menu', 'caption')
-        ordering = ('menu__hidden', 'menu__order', 'order', 'caption')
+        ordering = ('menu__hidden', 'menu__order',  "menu__id", 'order', 'id')
 
     def __unicode__(self):
         return u'%s -- %s' % (self.menu.caption, self.caption)

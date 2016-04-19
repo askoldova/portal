@@ -31,15 +31,33 @@ def _load_language_and_locale(lang, l10n_lang):
     return olang
 
 
-def _submenu_item_ref(lang, menu_item):
+def _submenu_item_ref(lang, menu_item, main_menu_ref):
     core.check_exist_and_type2(objects.Language, lang=lang)
     core.check_exist_and_type2(models.MenuItem, menu=menu_item)
+    core.check_exist_and_type2(objects.MenuRef, main_menu_ref=main_menu_ref)
     try:
         i = models.MenuItemI18n.objects.by_code_and_lang(menu_item.id, lang.lower_code)
         caption = i.caption
     except models.MenuItemI18n.DoesNotExist:
         caption = menu_item.caption
-    return objects.MenuItemRef(code=menu_item.id, slug=menu_item.slug, title=caption, lang=lang)
+    return objects.MenuItemRef(code=menu_item.id, slug=menu_item.slug, menu=main_menu_ref, title=caption, lang=lang)
+
+
+def _main_menu_ref(language, main_menu, subitems):
+    """
+    :type language: portal.objects.Language
+    :type main_menu: portal.models.MainMenu
+    :rtype: portal.objects.MenuRef
+    """
+    core.check_exist_and_type2(objects.Language, language=language)
+    core.check_exist_and_type2(models.MainMenu, menu_item=main_menu)
+    try:
+        i = models.MainMenuI18n.objects.by_code_and_lang(main_menu.id, language.lower_code)
+        caption = i.caption
+    except models.MainMenuI18n.DoesNotExist:
+        caption = main_menu.caption
+    main_menu = objects.MenuRef(main_menu.id, caption, main_menu.width, subitems)
+    return main_menu
 
 
 class PortalService(object):
@@ -217,7 +235,7 @@ class PortalService(object):
             else:
                 m = models.MenuItem.objects.by_code(subcategory_code)
 
-            return _submenu_item_ref(lang, m)
+            return _submenu_item_ref(lang, m, _main_menu_ref(lang, m.menu, ()))
         except models.MenuItem.DoesNotExist:
             return objects.MENU_ITEM_NOT_EXIST
 
@@ -227,24 +245,47 @@ class PortalService(object):
         """
         core.check_exist_and_type2(objects.Language, language=language)
 
-        menu_item = objects.MenuRef(-1, "None", 0, ())
+        main_menu_item = objects.MenuRef(-1, "None", 0, ())
         menu = ()
-        for s in models.MenuItem.objects.main_menu_items():
-            if menu_item.code != s.menu.id:
-                if menu_item.code > -1:
-                    menu += (menu_item,)
-                try:
-                    i = models.MainMenuI18n.objects.by_code_and_lang(s.menu.id, language.lower_code)
-                    caption = i.caption
-                except models.MainMenuI18n.DoesNotExist:
-                    caption = s.menu.caption
+        for menu_item in models.MenuItem.objects.main_menu_items():
+            if main_menu_item.code != menu_item.menu.id:
+                if main_menu_item.code > -1:
+                    menu += (main_menu_item,)
+                main_menu_item = _main_menu_ref(language, menu_item.menu, ())
+            submenu_item = _submenu_item_ref(language, menu_item, main_menu_item)
+            main_menu_item = main_menu_item.add_subitem(submenu_item)
 
-                menu_item = objects.MenuRef(s.menu.id, caption, s.menu.width, ())
-            submenu_item = _submenu_item_ref(language, s)
-            menu_item = menu_item.add_subitem(submenu_item)
-
-        if menu_item.code > -1:
-            menu += (menu_item,)
+        if main_menu_item.code > -1:
+            menu += (main_menu_item,)
 
         return menu
+
+    def main_menu_items(self, language):
+        """
+        :type language: portal.objects.Language
+        :rtype: tuple[portal.objects.MenuRef]
+        """
+        core.check_exist_and_type2(objects.Language, language=language)
+
+        menu = ()
+        for s in models.MainMenu.objects.all():
+            menu += (_main_menu_ref(language, main_menu=s, subitems=()),)
+
+        return menu
+
+    def menu_items(self, language):
+        """
+        :type language: portal.objects.Language
+        :rtype: tuple[portal.object.MenuRef]
+        """
+        core.check_exist_and_type2(objects.Language, language=language)
+
+        main_menu_item = objects.MenuRef(-1, "None", 0, ())
+        menu_items = ()
+        for menu_item in models.MenuItem.objects.all():
+            if main_menu_item.code != menu_item.menu.id:
+                main_menu_item = _main_menu_ref(language, menu_item.menu, ())
+            menu_items += (_submenu_item_ref(language, menu_item, main_menu_item),)
+
+        return menu_items
 # class PortalService

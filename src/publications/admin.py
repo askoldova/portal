@@ -3,6 +3,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from django.contrib import admin
+from django.db.models import Q
+
 from . import models
 from django.core import urlresolvers
 # noinspection PyUnresolvedReferences
@@ -24,6 +26,38 @@ class PublicationImagesAdmin(admin.TabularInline):
     extra = 3
 
 
+class MainMenuFilter(admin.SimpleListFilter):
+    def lookups(self, request, model_admin):
+        return ((None, _("No main menu")),) + \
+               tuple((p.code, p.title) for p in
+                     portal_service.main_menu_items(portal_service.get_default_language()))
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+        else:
+            return models.publication_filter_by_category(int(self.value()), queryset)
+
+MainMenuFilter.title = _("By Main Menu")
+MainMenuFilter.parameter_name = "main_menu"
+
+
+class MenuItemFilter(admin.SimpleListFilter):
+    def lookups(self, request, model_admin):
+        return ((None, _("No menu item")),) + \
+               tuple((p.code, u"{} -- {}".format(p.menu.title, p.title)) for p in
+                     portal_service.menu_items(portal_service.get_default_language()))
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+        else:
+            return models.publication_filter_by_subcategory(int(self.value()), queryset)
+
+MenuItemFilter.title = _("By Menu Item")
+MenuItemFilter.parameter_name = "menu_item"
+
+
 class PublicationAdmin(admin.ModelAdmin):
     inlines = (PublicationSubcategoryAdmin, PublicationImagesAdmin,)
     readonly_fields = ("old_id", "rss_stream", "rss_url",)
@@ -31,7 +65,7 @@ class PublicationAdmin(admin.ModelAdmin):
     list_display_links = list_display
     date_hierarchy = "publication_date"
 
-    list_filter = ("state", "locale", "rss_stream",)
+    list_filter = ("state", "locale", MenuItemFilter, MainMenuFilter, "rss_stream",)
 
     def get_form(self, request, obj=None, **kwargs):
         if obj:
